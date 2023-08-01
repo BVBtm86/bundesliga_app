@@ -1,1 +1,3 @@
 secrets.toml
+.buli_venv/
+.idea/
