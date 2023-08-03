@@ -35,9 +35,9 @@ def game_stats_analysis(data, data_gk, team, season):
 
     # ##### Season Table
     elif statistics_track == 'Season Table':
-        print(process_table_data(data=data))
-        # table_page(page_season=season,
-        #            favourite_team=team)
+        table_page(data=data,
+                   page_season=season,
+                   favourite_team=team)
 
     # # ##### Team Statistics
     # elif statistics_track == 'Team Statistics':
