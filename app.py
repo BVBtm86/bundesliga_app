@@ -100,7 +100,8 @@ def main():
                 " style='text-decoration: none; '>Code Repo</a></li>", unsafe_allow_html=True)
 
         with fan_club_logo:
-            st.image(Image.open('images/BVB_Romania.png'), width=75)
+            # st.image(Image.open('images/BVB_Romania.png'), width=75)
+            st.image("http://bvb09.ro/wp-content/uploads/2018/02/BDR_logo-01-1024x1024.png", width=75)
 
 
 if __name__ == "__main__":
