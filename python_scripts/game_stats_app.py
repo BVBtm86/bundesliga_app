@@ -56,3 +56,4 @@ def game_stats_analysis(data, data_gk, team, season):
     #     gk_page(page_season=season,
     #             favourite_team=team,
     #             all_seasons=app_seasons)
+    st.sidebar.markdown("")

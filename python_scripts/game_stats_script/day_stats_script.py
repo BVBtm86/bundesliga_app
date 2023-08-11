@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_config import match_stats_config, team_logos_config, team_stadiums_config
+from python_scripts.game_stats_script.game_stats_config import match_stats_config, team_logos_config, team_stadiums_config
 
 
 

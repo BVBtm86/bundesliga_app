@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 from streamlit_option_menu import option_menu
-from python_scripts.read_sql_data import retrieve_seasons_query, retrieve_season_teams, retrieve_season_data, \
+from python_scripts.read_data_script import retrieve_seasons_query, retrieve_season_teams, retrieve_season_data, \
     retrieve_season_gk_data
 from python_scripts.game_stats_app import game_stats_analysis
 
