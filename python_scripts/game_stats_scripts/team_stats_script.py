@@ -387,7 +387,7 @@ def team_page(data:pd.DataFrame,
                             "Stat": st.column_config.Column(
                                 width="medium")})
         else:
-            st.dataframe(data=season_opponent_stats.style.format("{:.2f}").apply(lambda x: ['background-color: #ffffff' if i % 2 == 0 
+            st.dataframe(data=season_opponent_stats.style.format({stat: '{:.2f}' for stat in ['Season' ,'Form' ,'Home' ,'Away' ,'1st Half' ,'2nd Half' ,'Win' ,'Draw' ,'Defeat']}).apply(lambda x: ['background-color: #ffffff' if i % 2 == 0 
                                                                            else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
                 lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
                             use_container_width=True, 
