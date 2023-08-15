@@ -1,49 +1,9 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_script.game_stats_config import match_stats_config, team_logos_config, team_stadiums_config
+from python_scripts.game_stats_scripts.game_stats_utils import match_stats_config, team_logos_config, team_stadiums_config, process_team_data
 
-
-
-def match_day_process_data(data, data_gk):
-    # ##### Read Data
-    buli_df = data.copy()
-    buli_gk_df = data_gk.copy()
-
-    # ##### Change Name Statistics
-    buli_df['Team_Lineup'] = buli_df['Team_Lineup'].apply(lambda x: x.replace("◆", ""))
-    buli_df['Opp_Lineup'] = buli_df['Opp_Lineup'].apply(lambda x: x.replace("◆", ""))
-    buli_df.rename(columns={"Team_Lineup": "Lineup",
-                            "Corner Kicks": "Corners",
-                            "Dribbles": "Dribbles",
-                            "Dribbles Completed": "Dribbles Completed",
-                            "Dribbles Completed %": "Dribbles %",
-                            "Passes Completed %": 'Pass %',
-                            "Passes Short Completed %": 'Pass Short %',
-                            "Passes Medium Completed %": 'Pass Medium %',
-                            "Passes Long Completed %": 'Pass Long %',
-                            "Passes Final 3rd": 'Final Third'}, inplace=True)
-
-    # ##### Add Team Goalkeeper Statistics
-    df_team_gk = \
-        buli_gk_df.groupby(["Season", "Week_No", "Team", "Opponent", "Venue"])[["Shots on Target",
-                                                                                "Saves", "Post-Shot xGoal",
-                                                                                "Passes", "Goal Kicks", "Throws",
-                                                                                "Crosses Faced",
-                                                                                "Crosses Stopped"]].sum()
-
-    df_team_gk.reset_index(inplace=True)
-    df_team_gk['Saves %'] = np.round(df_team_gk['Saves'] / df_team_gk['Shots on Target'] * 100, 2)
-    df_team_gk['Crosses Stopped %'] = np.round(df_team_gk['Crosses Stopped'] / df_team_gk['Crosses Faced'] * 100, 2)
-    df_team_gk.drop(columns=['Shots on Target', "Crosses Faced"], inplace=True)
-    df_team_gk.rename(columns={"Passes": "Total Passes"}, inplace=True)
-    buli_df = pd.merge(buli_df, df_team_gk, left_on=['Season', 'Week_No', 'Team', 'Opponent', 'Venue'],
-                       right_on=['Season', 'Week_No', 'Team', 'Opponent', 'Venue'])
-    season_buli_df = buli_df.reset_index(drop=True)
-
-    return season_buli_df
-
-
+# ##### Process Match Day Stats Incons
 def stat_name_icon(stats):
     # ##### Return Match Day Stats Icons
     match_day_name_icon = []
@@ -52,6 +12,7 @@ def stat_name_icon(stats):
     return match_day_name_icon
 
 
+# ##### Match Day Stats
 def match_day_stats(data, home_team, away_team, stats, venue):
     if venue == "Home":
         day_stats = data[(data['Team'] == home_team) & (data['Opponent'] == away_team) &
@@ -75,7 +36,8 @@ def match_day_stats(data, home_team, away_team, stats, venue):
     return game_stats
 
 
-def match_day_page(data, data_gk, page_season, favourite_team):
+# ##### Match Data Page
+def match_day_page(data, page_season, favourite_team):
     
     # ##### Style Team Logo
     st.markdown(
@@ -90,8 +52,7 @@ def match_day_page(data, data_gk, page_season, favourite_team):
     )
 
     # ##### Season Data
-    season_buli_df = match_day_process_data(data=data,
-                                            data_gk=data_gk)
+    season_buli_df = data.copy()
 
     # ##### Match Day Page Options
     st.sidebar.subheader("Options")
@@ -142,18 +103,10 @@ def match_day_page(data, data_gk, page_season, favourite_team):
     # ##### Home/Away Score
     _, home_score, _, away_score, _ = st.columns([1.25, 2, 0.25, 2, 0.25])
     with home_score:
-        home_goals = season_buli_df[(season_buli_df['Team'] == home_team) & 
-                                    (season_buli_df['Opponent'] == away_team) & 
-                                    (season_buli_df['Venue'] == 'Home')]['Goals'].values[0] + season_buli_df[(season_buli_df['Opponent'] == home_team) & 
-                                    (season_buli_df['Team'] == away_team) & 
-                                    (season_buli_df['Venue'] == 'Away')]['Own Goals'].values[0]
+        home_goals = season_buli_df[(season_buli_df['Team'] == home_team) & (season_buli_df['Opponent'] == away_team) & (season_buli_df['Venue'] == 'Home')]['Goals'].values[0]
         st.markdown(f"<h1 style='text-align: center;'p>{home_goals}</h1>", unsafe_allow_html=True)
     with away_score:
-        away_goals = season_buli_df[(season_buli_df['Opponent'] == home_team) & 
-                                    (season_buli_df['Team'] == away_team) & 
-                                    (season_buli_df['Venue'] == 'Away')]['Goals'].values[0] + season_buli_df[(season_buli_df['Team'] == home_team) & 
-                                    (season_buli_df['Opponent'] == away_team) & 
-                                    (season_buli_df['Venue'] == 'Home')]['Own Goals'].values[0]
+        away_goals = season_buli_df[(season_buli_df['Team'] == away_team) & (season_buli_df['Opponent'] == home_team) & (season_buli_df['Venue'] == 'Away')]['Goals'].values[0]
         st.markdown(f"<h1 style='text-align: center;'p>{away_goals}</h1>", unsafe_allow_html=True)
 
     # ##### Match Day based on Home and Away Team selected
@@ -170,7 +123,7 @@ def match_day_page(data, data_gk, page_season, favourite_team):
     with match_day_col:
         st.markdown(" ")
         st.markdown(f"<h5 style='text-align: center;'p><font color = #d20614>{match_stats_config['stat_name'][stat_selection]}</font> Stats</h5>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center;'p>Match Day: {match_day}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center;'p>Match Day: <b>{match_day}</b></p>", unsafe_allow_html=True)
 
     # ##### Stat Icon
     with icon_col:
