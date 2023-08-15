@@ -7,7 +7,7 @@ import streamlit as st
 
 # ########## Supabase Connection
 st.cache_resource()
-def init_connection() -> function:
+def init_connection():
     url = st.secrets["supabase_url"]
     key = st.secrets["supabase_key"]
 
