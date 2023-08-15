@@ -5,7 +5,8 @@ from python_scripts.game_stats_scripts.game_stats_utils import team_logos_config
 
 
 # ##### Create Bundesliga Table 
-def buli_table_data(data, table_type):
+def buli_table_data(data:pd.DataFrame, 
+                    table_type:str) -> pd.DataFrame:
     # ##### Season Data
     buli_season = data[data[table_type] == 1].reset_index(drop=True)
 
@@ -22,7 +23,9 @@ def buli_table_data(data, table_type):
     return buli_tab
 
 # ##### Bundesliga Table Page
-def table_page(data, page_season, favourite_team):
+def table_page(data:pd.DataFrame, 
+               page_season:str, 
+               favourite_team:str) -> st:
 
     # ##### Process Season Data
     season_df = filter_season_data(data=data)

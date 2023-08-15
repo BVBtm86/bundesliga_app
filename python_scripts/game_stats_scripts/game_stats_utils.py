@@ -1,8 +1,15 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+from configdict import ConfigDict
 
 # ########## Supabase Tables
+# supabase_tabs_info = ConfigDict(
+#      info_tab = "buli_seasons_info",
+#     team_stats_tab = "buli_stats_team",
+#     player_stats_tab = "buli_stats_player",
+#     gk_stas_tab = "buli_stats_gk")
+
 info_tab = "buli_seasons_info"
 team_stats_tab = "buli_stats_team"
 player_stats_tab = "buli_stats_player"
@@ -148,7 +155,8 @@ previous_seasons = {'2019-2020':'2018-2019',
 
 # ##### Process Bundesliga Team and Gk Data
 st.cache_data(ttl=3600)
-def process_team_data(data, data_gk):
+def process_team_data(data:pd.DataFrame, 
+                      data_gk:pd.DataFrame) -> pd.DataFrame:
     # ##### Read Data
     buli_df = data.copy()
     buli_gk_df = data_gk.copy()
@@ -189,7 +197,7 @@ def process_team_data(data, data_gk):
 
 
 # ##### Aggregate Goal and Own Goals per Team
-def process_goal_data(data):
+def process_goal_data(data:pd.DataFrame) -> pd.DataFrame:
 
     # ##### Goals Statistics
     buli_df = data.copy()
@@ -210,7 +218,7 @@ def process_goal_data(data):
 
 # ##### Process Season Bundesliga Data
 st.cache_data(ttl=3600)
-def filter_season_data(data):
+def filter_season_data(data:pd.DataFrame) -> pd.DataFrame:
     buli_df = data.copy()
 
     # ##### Creating Tabel Stats Filter
@@ -228,15 +236,13 @@ def filter_season_data(data):
     return buli_df
 
 # ##### Metrics Cars Style
-def style_metric_cards(
-        background_color: str = "#e5e5e6",
-        border_radius_px: int = 15,
-        border_top_color: str = "#d20614",
-        border_left_color: str = "#d20614",
-        border_right_color: str = "#ffffff",
-        border_bottom_color: str = "#ffffff",
-        box_shadow: bool = True,
-    ):
+def style_metric_cards(background_color: str = "#e5e5e6", 
+                       border_radius_px: int = 15, 
+                       border_top_color: str = "#d20614", 
+                       border_left_color: str = "#d20614", 
+                       border_right_color: str = "#ffffff", 
+                       border_bottom_color: str = "#ffffff", 
+                       box_shadow: bool = True) -> st:
 
         box_shadow_str = ("box-shadow: 0 0 1rem 0 #e5e5e6 !important;" if box_shadow 
                             else "box-shadow: none !important;")

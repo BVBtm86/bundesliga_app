@@ -4,7 +4,7 @@ import streamlit as st
 from python_scripts.game_stats_scripts.game_stats_utils import match_stats_config, team_logos_config, team_stadiums_config, process_team_data
 
 # ##### Process Match Day Stats Incons
-def stat_name_icon(stats):
+def stat_name_icon(stats:str) -> list:
     # ##### Return Match Day Stats Icons
     match_day_name_icon = []
     for i in range(len(stats)):
@@ -13,7 +13,11 @@ def stat_name_icon(stats):
 
 
 # ##### Match Day Stats
-def match_day_stats(data, home_team, away_team, stats, venue):
+def match_day_stats(data:pd.DataFrame, 
+                    home_team:str, 
+                    away_team:str, 
+                    stats:str, 
+                    venue:str) -> list:
     if venue == "Home":
         day_stats = data[(data['Team'] == home_team) & (data['Opponent'] == away_team) &
                          (data['Venue'] == venue)][stats].values[0]
@@ -37,7 +41,9 @@ def match_day_stats(data, home_team, away_team, stats, venue):
 
 
 # ##### Match Data Page
-def match_day_page(data, page_season, favourite_team):
+def match_day_page(data:pd.DataFrame, 
+                   page_season:str, 
+                   favourite_team:str) -> st:
     
     # ##### Style Team Logo
     st.markdown(

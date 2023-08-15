@@ -7,16 +7,18 @@ import streamlit as st
 
 # ########## Supabase Connection
 st.cache_resource()
-def init_connection():
+def init_connection() -> function:
     url = st.secrets["supabase_url"]
     key = st.secrets["supabase_key"]
+
     return create_client(url, key)
 
 supabase = init_connection()
 
 # ########## Retrieve Season Info
 st.cache_data(ttl=3600)
-def retrieve_season_info(table):
+def retrieve_season_info(table:str) -> tuple[pd.DataFrame, 
+                                             pd.DataFrame]:
     """ Available Seasons querry """
     data_query = supabase.table(table).select('*').execute().data
     data = pd.DataFrame(data_query)
@@ -30,7 +32,9 @@ def retrieve_season_info(table):
 
 # #################################################################################################### Game Stats Analysis
 # ########## Retrieve Season Teams
-def retrieve_season_teams(table, season):
+def retrieve_season_teams(table:str, 
+                          season:str) -> tuple[pd.DataFrame, 
+                                                          int]:
     """ Teams per Season querry """
     data_query = supabase.table(table).select('*').eq('Season', season).execute().data
     data = pd.DataFrame(data_query)
@@ -45,7 +49,8 @@ def retrieve_season_teams(table, season):
 
 # ########## Retrieve Season Data
 st.cache_data(ttl=3600)
-def retrieve_season_data(table, season):
+def retrieve_season_data(table:str, 
+                         season:str) -> pd.DataFrame:
     """ Return Season Data """
     data_query = supabase.table(table).select('*').eq('Season', season).execute().data
     season_data = pd.DataFrame(data_query)  
@@ -55,7 +60,10 @@ def retrieve_season_data(table, season):
 
 # # ########## Retrieve Last 5 Seasons Data
 st.cache_data(ttl=3600)
-def retrieve_all_seasons_data(table, team, seasons, team_analysis=False):
+def retrieve_all_seasons_data(table:str, 
+                              team:str, 
+                              seasons:str, 
+                              team_analysis:bool=False) -> pd.DataFrame:
     """ Return All Seasons Data """
     data_query = supabase.table(table).select('*').eq('Team', team).execute().data
     all_seasons_data = pd.DataFrame(data_query)
@@ -67,7 +75,7 @@ def retrieve_all_seasons_data(table, team, seasons, team_analysis=False):
         opponent_seasons_data = opponent_seasons_data[opponent_seasons_data['Season'].isin(seasons)].reset_index(drop=True)
         all_seasons_data['Goals'] = all_seasons_data['Goals'] + opponent_seasons_data['Own Goals']
         all_seasons_data['Goals Ag'] = all_seasons_data['Own Goals'] + opponent_seasons_data['Goals']
-        
+
     return all_seasons_data
 
 # #################################################################################################### Game Events Analysis

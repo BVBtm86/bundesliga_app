@@ -6,8 +6,12 @@ import plotly.express as px
 from scipy.stats import ttest_ind
 from python_scripts.game_stats_scripts.game_stats_utils import team_logos_config, previous_seasons, season_filter, team_most_important_stats, stats_team, stats_count_calculations, stats_perc_calculations, filter_season_data, style_metric_cards
 
-
-def most_important_stats(data, data_all, current_season, previous_seasons, team):
+def most_important_stats(data:pd.DataFrame, 
+                         data_all:pd.DataFrame, 
+                         current_season:str, 
+                         previous_seasons:dict, 
+                         team:str) -> tuple[list, 
+                                            list]:
 
     season_data = data.copy()
     # ##### Current Season Avg Stats
@@ -45,9 +49,14 @@ def most_important_stats(data, data_all, current_season, previous_seasons, team)
         diff_important_stats = ["", "", "", "", "", "", ""]
 
     return season_important_stats, diff_important_stats
-    
 
-def teams_day_analysis(data, team, stat_name):
+def teams_day_analysis(data:pd.DataFrame, 
+                       team:str, 
+                       stat_name:str) -> tuple[px.bar, 
+                                               float, 
+                                               float, 
+                                               float, 
+                                               str]:
 
     # ##### Rename Stats to Orginal Name
     df_match_day = data.copy()
@@ -134,8 +143,16 @@ def teams_day_analysis(data, team, stat_name):
 
     return match_day_fig, avg_team, avg_opp, better, stat_sig_name
 
-
-def team_season_filter(data_team_agg, data_opp_agg, team, stat_name):
+def team_season_filter(data_team_agg:pd.DataFrame, 
+                       data_opp_agg:pd.DataFrame, 
+                       team:str, 
+                       stat_name:str) -> tuple[px.bar, 
+                                               list, 
+                                               float, 
+                                               float, 
+                                               list, 
+                                               float, 
+                                               float]:
 
     # ##### Season Filter Stats
     team_stat = data_team_agg[data_team_agg['Stat'] == stat_name]
@@ -198,7 +215,9 @@ def team_season_filter(data_team_agg, data_opp_agg, team, stat_name):
 
 
 st.cache_data(ttl=3600)
-def team_season_stats(data, team):
+def team_season_stats(data:pd.DataFrame, 
+                      team:str) -> tuple[pd.DataFrame, 
+                                         pd.DataFrame]:
 
     team_season_data = data.copy()
     team_season_data.rename(columns={'Final Third':'Passes Final Third'}, inplace=True)
@@ -251,8 +270,10 @@ def team_season_stats(data, team):
     season_team_stats = season_team_stats.round(2)
     return season_team_stats, season_opponent_stats
 
-
-def team_page(data, data_all, page_season, favourite_team):
+def team_page(data:pd.DataFrame, 
+              data_all:pd.DataFrame, 
+              page_season:str, 
+              favourite_team:str) -> st:
     config = {'displayModeBar': False}
 
     # #### Team Statistics Type

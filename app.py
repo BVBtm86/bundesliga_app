@@ -7,7 +7,7 @@ from python_scripts.data_script import retrieve_season_info, retrieve_season_tea
 from python_scripts.game_stats_app import game_stats_analysis
 
 
-def main():
+def main() -> st:
 
     # ##### Bundesliga Logo
     st.sidebar.image(Image.open('images/Bundesliga.png'))

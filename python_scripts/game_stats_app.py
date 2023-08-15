@@ -6,7 +6,9 @@ from python_scripts.game_stats_scripts.table_stats_script import table_page
 from python_scripts.game_stats_scripts.team_stats_script import team_page
 from python_scripts.game_stats_scripts.game_stats_utils import process_team_data, process_goal_data, team_stats_tab, player_stats_tab, gk_stas_tab
 
-def game_stats_analysis(team, season, last_5_seasons):
+def game_stats_analysis(team:str, 
+                        season:str, 
+                        last_5_seasons:list) -> st:
 
     # ##### Load Season Data
     season_team_data = retrieve_season_data(table=team_stats_tab, 
