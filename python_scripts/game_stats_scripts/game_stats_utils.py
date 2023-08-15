@@ -164,19 +164,6 @@ def process_team_data(data, data_gk):
                             "Passes Medium Completed %": 'Pass Medium %',
                             "Passes Long Completed %": 'Pass Long %',
                             "Passes Final 3rd": 'Final Third'}, inplace=True)
-    
-    # ##### Goals Statistics
-    home_df = buli_df[buli_df['Venue'] == 'Home'].copy()
-    home_df.reset_index(drop=True, inplace=True)
-    away_df = buli_df[buli_df['Venue'] == 'Away'].copy()
-    away_df.reset_index(drop=True, inplace=True)
-    home_df['Goals'] = home_df['Goals'] + away_df['Own Goals']
-    away_df['Goals'] = away_df['Goals'] + home_df['Own Goals']
-    home_df['Goals Ag'] = away_df['Goals']
-    away_df['Goals Ag'] = home_df['Goals']
-    final_buli_df = pd.concat([home_df, away_df])
-    final_buli_df = final_buli_df.sort_values(by=['Id'])
-    final_buli_df.reset_index(drop=True, inplace=True)
 
     # ##### Aggregate Goalkeeper Statistics
     df_team_gk = \
@@ -192,11 +179,31 @@ def process_team_data(data, data_gk):
     df_team_gk.rename(columns={"Passes": "Total Passes"}, inplace=True)
 
     # ##### Create Final Bundesliga data
-    final_buli_df = pd.merge(left=final_buli_df, 
+    final_buli_df = pd.merge(left=buli_df, 
                              right=df_team_gk, 
                              left_on=['Season', 'Week_No', 'Team', 'Opponent', 'Venue'],
                              right_on=['Season', 'Week_No', 'Team', 'Opponent', 'Venue'])
     final_buli_df = final_buli_df.reset_index(drop=True)
+
+    return final_buli_df
+
+
+# ##### Aggregate Goal and Own Goals per Team
+def process_goal_data(data):
+
+    # ##### Goals Statistics
+    buli_df = data.copy()
+    home_df = buli_df[buli_df['Venue'] == 'Home'].copy()
+    home_df.reset_index(drop=True, inplace=True)
+    away_df = buli_df[buli_df['Venue'] == 'Away'].copy()
+    away_df.reset_index(drop=True, inplace=True)
+    home_df['Goals'] = home_df['Goals'] + away_df['Own Goals']
+    away_df['Goals'] = away_df['Goals'] + home_df['Own Goals']
+    home_df['Goals Ag'] = away_df['Goals']
+    away_df['Goals Ag'] = home_df['Goals']
+    final_buli_df = pd.concat([home_df, away_df])
+    final_buli_df = final_buli_df.sort_values(by=['Id'])
+    final_buli_df.reset_index(drop=True, inplace=True)
 
     return final_buli_df
 

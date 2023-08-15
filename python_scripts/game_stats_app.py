@@ -4,7 +4,7 @@ from python_scripts.data_script import retrieve_season_data, retrieve_all_season
 from python_scripts.game_stats_scripts.day_stats_script import match_day_page
 from python_scripts.game_stats_scripts.table_stats_script import table_page
 from python_scripts.game_stats_scripts.team_stats_script import team_page
-from python_scripts.game_stats_scripts.game_stats_utils import process_team_data, team_stats_tab, player_stats_tab, gk_stas_tab
+from python_scripts.game_stats_scripts.game_stats_utils import process_team_data, process_goal_data, team_stats_tab, player_stats_tab, gk_stas_tab
 
 def game_stats_analysis(team, season, last_5_seasons):
 
@@ -14,8 +14,8 @@ def game_stats_analysis(team, season, last_5_seasons):
     season_gk_data = retrieve_season_data(table=gk_stas_tab,
                                           season=season)
     
-    season_data = process_team_data(data=season_team_data, 
-                                    data_gk=season_gk_data)
+    season_data = process_goal_data(data=process_team_data(data=season_team_data, 
+                                                           data_gk=season_gk_data))
 
     # ##### Page Description
     st.markdown(

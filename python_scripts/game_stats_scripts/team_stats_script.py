@@ -75,18 +75,17 @@ def teams_day_analysis(data, team, stat_name):
     if min_value < 10:
         min_value = 0
     max_value = np.max(plot_data[stat_name]) * 1.1
-    match_day_fig = px.bar(plot_data,
-                 x="Game",
-                 y=stat_name,
-                 color="Result",
-                 facet_col="TEAM",
-                 color_discrete_map={
-                     'Win': "rgb(200,11,1)",
-                     'Draw': "rgb(179, 179, 179)",
-                     'Defeat': "rgb(78,78,80)"},
-                 text=stat_name,
-                 hover_name='Team',
-                 )
+    match_day_fig = px.bar(plot_data, 
+                           x="Game", 
+                           y=stat_name, 
+                           color="Result", 
+                           facet_col="TEAM", 
+                           color_discrete_map={
+                               'Win': "rgb(200,11,1)",
+                               'Draw': "rgb(179, 179, 179)",
+                               'Defeat': "rgb(78,78,80)"},
+                            text=stat_name,
+                            hover_name='Team')
     match_day_fig.update_layout({
         "plot_bgcolor": "rgba(0, 0, 0, 0)",
     },
@@ -102,7 +101,6 @@ def teams_day_analysis(data, team, stat_name):
         ),
         yaxis_range=[min_value, max_value]
     )
-    match_day_fig.update_yaxes(title_text=stat_name)
 
     # #### Insight Statistics
     if stat_name in stats_perc_calculations.keys():
@@ -137,8 +135,7 @@ def teams_day_analysis(data, team, stat_name):
     return match_day_fig, avg_team, avg_opp, better, stat_sig_name
 
 
-
-def team_season_filter(data_team_agg, data_opp_agg, data_raw, team, stat_name):
+def team_season_filter(data_team_agg, data_opp_agg, team, stat_name):
 
     # ##### Season Filter Stats
     team_stat = data_team_agg[data_team_agg['Stat'] == stat_name]
@@ -150,11 +147,10 @@ def team_season_filter(data_team_agg, data_opp_agg, data_raw, team, stat_name):
     data_agg.columns = ['Season Filter', stat_name, 'Team']
 
     # ##### Plot Min and Max Values
-    data_season_type=data_raw.copy()
-    min_value = np.min(data_season_type[stat_name]) * 0.8
+    min_value = np.min(data_agg[stat_name]) * 0.8
     if min_value < 10:
         min_value = 0
-    max_value = np.max(data_season_type[stat_name]) * 1.1
+    max_value = np.max(data_agg[stat_name]) * 1.1
 
     # ##### Plot Data
     team_stat_fig = px.bar(data_agg,
@@ -165,13 +161,13 @@ def team_season_filter(data_team_agg, data_opp_agg, data_raw, team, stat_name):
                            color_discrete_map={
                                team: "rgb(200,11,1)",
                                'Opponent': "rgb(179, 179, 179)"}, 
-                               height=400,
-                           text=stat_name,
-                           title=f"{team} {stat_name} per Game")
+                            height=400,
+                            text=stat_name,
+                            text_auto='.2f',
+                            title=f"{team} {stat_name} per Game")
     team_stat_fig.update_layout({
         "plot_bgcolor": "rgba(0, 0, 0, 0)"},
         yaxis_range=[min_value, max_value])
-    team_stat_fig.update_yaxes(title_text=stat_name)
 
     # ##### Season Filter Insights Home vs Away
     team_insight_data = data_agg[data_agg['Team'] == team]
@@ -330,7 +326,6 @@ def team_page(data, data_all, page_season, favourite_team):
             fig_type_team, period_venue, period_venue_1, period_venue_2, period_insights, \
                 period_insights_1, period_insights_2 = team_season_filter(data_team_agg=season_team_stats, 
                                             data_opp_agg=season_opponent_stats, 
-                                            data_raw=data, 
                                             team=favourite_team, 
                                             stat_name=filter_stat)
             st.plotly_chart(fig_type_team, config=config, use_container_width=True)
@@ -379,4 +374,3 @@ def team_page(data, data_all, page_season, favourite_team):
                             column_config={
                             "Stat": st.column_config.Column(
                                 width="medium")})
-            

@@ -62,11 +62,12 @@ def retrieve_all_seasons_data(table, team, seasons, team_analysis=False):
     all_seasons_data = all_seasons_data[all_seasons_data['Season'].isin(seasons)].reset_index(drop=True)
 
     if team_analysis:
-        data_opponent_query = supabase.table(table).select('*').eq('Opponent', team).execute().data
-        all_seasons_opponent_data = pd.DataFrame(data_opponent_query)
-        all_seasons_opponent_data = all_seasons_opponent_data[all_seasons_opponent_data['Season'].isin(seasons)].reset_index(drop=True)
-        all_seasons_data = pd.concat([all_seasons_data, all_seasons_opponent_data])
-
+        data_opponent_query = supabase.table(table).select('Season, Goals, Own Goals').eq('Opponent', team).execute().data
+        opponent_seasons_data = pd.DataFrame(data_opponent_query)
+        opponent_seasons_data = opponent_seasons_data[opponent_seasons_data['Season'].isin(seasons)].reset_index(drop=True)
+        all_seasons_data['Goals'] = all_seasons_data['Goals'] + opponent_seasons_data['Own Goals']
+        all_seasons_data['Goals Ag'] = all_seasons_data['Own Goals'] + opponent_seasons_data['Goals']
+        
     return all_seasons_data
 
 # #################################################################################################### Game Events Analysis
