@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_scripts.game_stats_utils import team_logos_config, filter_season_data
+from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, filter_season_data, process_goals_opponent, config_season_filter
 
 
 # ##### Create Bundesliga Table 
@@ -27,14 +27,18 @@ def table_page(data:pd.DataFrame,
                page_season:str, 
                favourite_team:str) -> st:
 
+    # ##### Process Goals Against
+    data_processed = process_goals_opponent(data=data)
+    
     # ##### Process Season Data
-    season_df = filter_season_data(data=data)
+    season_df = filter_season_data(data=data_processed)
+
 
     # ##### Check Max Match Day
     match_day = season_df['Week_No'].max()
 
     # ##### Season Table Filter
-    filter_type = ["Season", "Form", "Home", "Away", "1st Half", "2nd Half"]
+    filter_type = config_season_filter.season_filter[:-3]
     if match_day <= 17:
         filter_type.remove("2nd Half")
     season_type = st.sidebar.selectbox(label="Season Filter", 
@@ -47,14 +51,17 @@ def table_page(data:pd.DataFrame,
 
     # ##### Season Teams
     teams_season = buli_season_df['Team'].unique()
-    pos_favourite_team = list(teams_season).index(favourite_team)
+    if favourite_team in buli_season_df['Team']:
+        pos_favourite_team = list(teams_season).index(favourite_team)
+    else:
+        pos_favourite_team = None
 
     # ##### Season Rank
     buli_season_df = buli_season_df.reset_index(drop=False)
     buli_season_df.rename(columns={'index': 'Rank'}, inplace=True)
 
     # ##### Team Logo
-    logo_data = [team_logos_config[team] for team in buli_season_df['Team']]
+    logo_data = [config_teams_images['config_teams_logo'][team] for team in buli_season_df['Team']]
     buli_season_df.insert(0, " ", logo_data)
     
     # ##### Final Bundesliga Season Filter Table
@@ -70,4 +77,5 @@ def table_page(data:pd.DataFrame,
                     ),
                     " ": st.column_config.ImageColumn(
                         width="small"
-                    )})
+                    ),
+                    })

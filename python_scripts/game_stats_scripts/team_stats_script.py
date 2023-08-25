@@ -4,7 +4,11 @@ import streamlit as st
 import streamlit as st
 import plotly.express as px
 from scipy.stats import ttest_ind
-from python_scripts.game_stats_scripts.game_stats_utils import team_logos_config, previous_seasons, season_filter, team_most_important_stats, stats_team, stats_count_calculations, stats_perc_calculations, filter_season_data, style_metric_cards
+from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, previous_seasons, config_season_filter, config_importance_stats, config_team_stats, filter_season_data, style_metric_cards
+import warnings
+
+#suppress warnings
+warnings.filterwarnings('ignore')
 
 def most_important_stats(data:pd.DataFrame, 
                          data_all:pd.DataFrame, 
@@ -15,14 +19,14 @@ def most_important_stats(data:pd.DataFrame,
 
     season_data = data.copy()
     # ##### Current Season Avg Stats
-    season_important_stats = list(season_data[season_data['Team'] == team][team_most_important_stats[:4]].mean().round(2).values)
+    season_important_stats = list(season_data[season_data['Team'] == team][config_importance_stats.team_important_stats[:4]].mean().round(2).values)
 
     # ##### Current Season Sum Stats
     season_data['Win'] = np.where(season_data['Result'] == 'Win', 1, 0)
     season_data['Draw'] = np.where(season_data['Result'] == 'Draw', 1, 0)
     season_important_stats.append((season_data[season_data['Team'] == team]['Win'] * 3 + season_data[season_data['Team'] == team]['Draw']).sum())
-    season_important_stats.append(season_data[season_data['Team'] == team][team_most_important_stats[4]].sum())
-    season_important_stats.append(season_data[season_data['Team'] == team][team_most_important_stats[5]].sum())
+    season_important_stats.append(season_data[season_data['Team'] == team][config_importance_stats.team_important_stats[4]].sum())
+    season_important_stats.append(season_data[season_data['Team'] == team][config_importance_stats.team_important_stats[5]].sum())
     current_season_match_day = season_data['Week_No'].max()
 
     # ##### Last Season Stats
@@ -34,12 +38,12 @@ def most_important_stats(data:pd.DataFrame,
     if len(season_previous) > 0:
         previous_data_season = data_all[(data_all['Season'] == season_previous) & (data_all['Week_No'] <= current_season_match_day)].reset_index(drop=True)
         if previous_data_season.shape[0] > 0:
-            previous_season_important_stats = list(previous_data_season[previous_data_season['Team'] == team][team_most_important_stats[:4]].mean().round(2).values)
+            previous_season_important_stats = list(previous_data_season[previous_data_season['Team'] == team][config_importance_stats.team_important_stats[:4]].mean().round(2).values)
             previous_data_season['Win'] = np.where(previous_data_season['Result'] == 'Win', 1, 0)
             previous_data_season['Draw'] = np.where(previous_data_season['Result'] == 'Draw', 1, 0)
             previous_season_important_stats.append((previous_data_season[previous_data_season['Team'] == team]['Win'] * 3 + previous_data_season[previous_data_season['Team'] == team]['Draw']).sum())
-            previous_season_important_stats.append(previous_data_season[previous_data_season['Team'] == team][team_most_important_stats[4]].sum())
-            previous_season_important_stats.append(previous_data_season[previous_data_season['Team'] == team][team_most_important_stats[5]].sum())
+            previous_season_important_stats.append(previous_data_season[previous_data_season['Team'] == team][config_importance_stats.team_important_stats[4]].sum())
+            previous_season_important_stats.append(previous_data_season[previous_data_season['Team'] == team][config_importance_stats.team_important_stats[5]].sum())
             diff_important_stats = list(pd.Series(season_important_stats) - pd.Series(previous_season_important_stats))
             diff_important_stats[:4] = np.round(diff_important_stats[:4],2)
         else:
@@ -57,18 +61,10 @@ def teams_day_analysis(data:pd.DataFrame,
                                                float, 
                                                float, 
                                                str]:
-
-    # ##### Rename Stats to Orginal Name
-    df_match_day = data.copy()
-    df_match_day.rename(columns={"Dribbles %":"Dribbles Completed %", 
-                                  'Pass %':"Passes Completed %", 
-                                  'Pass Short %':"Passes Short Completed %", 
-                                  'Pass Medium %':"Passes Medium Completed %", 
-                                  'Pass Long %':"Passes Long Completed %", 
-                                  'Final Third':"Passes Final Third"}, inplace=True)
     
     # ##### Create Aerial Duel Total Stat
-    df_match_day['Duel Aerial'] = df_match_day['Duel Aerial Won'] + df_match_day['Duel Aerial Lost']
+    df_match_day = data.copy()
+    df_match_day['Aerial Duel'] = df_match_day['Aerial Duel Won'] + df_match_day['Aerial Duel Lost']
 
     # ##### Filter Season Data by Selected Team
     df_team = df_match_day[(df_match_day['Team'] == team)].reset_index(drop=True)
@@ -84,61 +80,67 @@ def teams_day_analysis(data:pd.DataFrame,
     if min_value < 10:
         min_value = 0
     max_value = np.max(plot_data[stat_name]) * 1.1
-    match_day_fig = px.bar(plot_data, 
-                           x="Game", 
-                           y=stat_name, 
-                           color="Result", 
-                           facet_col="TEAM", 
-                           color_discrete_map={
-                               'Win': "rgb(200,11,1)",
-                               'Draw': "rgb(179, 179, 179)",
-                               'Defeat': "rgb(78,78,80)"},
-                            text=stat_name,
-                            hover_name='Team')
-    match_day_fig.update_layout({
-        "plot_bgcolor": "rgba(0, 0, 0, 0)",
-    },
-        xaxis1=dict(
-            tickmode='array',
-            tickvals=[i for i in range(1, len(df_team) + 1)],
-            ticktext=plot_data['Game'].unique(),
-        ),
-        xaxis2=dict(
-            tickmode='array',
-            tickvals=[i for i in range(1, len(df_opp) + 1)],
-            ticktext=plot_data['Game'].unique(),
-        ),
-        yaxis_range=[min_value, max_value]
-    )
+    if plot_data[stat_name].sum() > 0:
+        match_day_fig = px.bar(plot_data, 
+                            x="Game", 
+                            y=stat_name, 
+                            color="Result", 
+                            facet_col="TEAM", 
+                            color_discrete_map={
+                                'Win': "rgb(200,11,1)",
+                                'Draw': "rgb(179, 179, 179)",
+                                'Defeat': "rgb(78,78,80)"},
+                                text=stat_name,
+                                hover_name='Team')
+        match_day_fig.update_layout({
+            "plot_bgcolor": "rgba(0, 0, 0, 0)",
+        },
+            xaxis1=dict(
+                tickmode='array',
+                tickvals=[i for i in range(1, len(df_team) + 1)],
+                ticktext=plot_data['Game'].unique(),
+            ),
+            xaxis2=dict(
+                tickmode='array',
+                tickvals=[i for i in range(1, len(df_opp) + 1)],
+                ticktext=plot_data['Game'].unique(),
+            ),
+            yaxis_range=[min_value, max_value]
+        )
 
-    # #### Insight Statistics
-    if stat_name in stats_perc_calculations.keys():
-        stats_agg = stats_perc_calculations[stat_name]
-        avg_team_calc = pd.DataFrame(df_team[stats_agg].sum()).T
-        avg_team = np.round(avg_team_calc[stats_agg[1]] / avg_team_calc[stats_agg[0]] * 100, 2).values[0]
-        avg_opp_calc = pd.DataFrame(df_opp[stats_agg].sum()).T
-        avg_opp = np.round(avg_opp_calc[stats_agg[1]] / avg_opp_calc[stats_agg[0]] * 100, 2).values[0]
-    else:
-        avg_team = np.round(df_team[stat_name].mean(), 2)
-        avg_opp = np.round(df_opp[stat_name].mean(), 2)
+        # #### Insight Statistics
+        if stat_name in config_team_stats.stats_perc_calculations.keys():
+            stats_agg = config_team_stats.stats_perc_calculations[stat_name]
+            avg_team_calc = pd.DataFrame(df_team[stats_agg].sum()).T
+            avg_team = np.round(avg_team_calc[stats_agg[1]] / avg_team_calc[stats_agg[0]] * 100, 2).values[0]
+            avg_opp_calc = pd.DataFrame(df_opp[stats_agg].sum()).T
+            avg_opp = np.round(avg_opp_calc[stats_agg[1]] / avg_opp_calc[stats_agg[0]] * 100, 2).values[0]
+        else:
+            avg_team = np.round(df_team[stat_name].mean(), 2)
+            avg_opp = np.round(df_opp[stat_name].mean(), 2)
 
-    better = np.round(np.sum(df_team[stat_name] > df_opp[stat_name]) / len(df_opp) * 100, 2)
+        better = np.round(np.sum(df_team[stat_name] > df_opp[stat_name]) / len(df_opp) * 100, 2)
+        # ##### Statistical Significance
+        stat_sig = ttest_ind(df_team[stat_name].values,
+                            df_opp[stat_name].values)[1]
 
-    # ##### Statistical Significance
-    stat_sig = ttest_ind(df_team[stat_name].values,
-                         df_opp[stat_name].values)[1]
-
-    if len(df_team) >= 10:
-        if stat_sig <= 0.05:
-            if avg_team > avg_opp:
-                stat_sig_name = "Statistically Better"
-            elif avg_team < avg_opp:
-                stat_sig_name = "Statistically Worse"
+        if len(df_team) >= 10:
+            if stat_sig <= 0.05:
+                if avg_team > avg_opp:
+                    stat_sig_name = "Statistically Better"
+                elif avg_team < avg_opp:
+                    stat_sig_name = "Statistically Worse"
+                else:
+                    stat_sig_name = ""
             else:
                 stat_sig_name = ""
         else:
             stat_sig_name = ""
     else:
+        match_day_fig = None
+        avg_team = ""
+        avg_opp = ""
+        better = ""
         stat_sig_name = ""
 
     return match_day_fig, avg_team, avg_opp, better, stat_sig_name
@@ -188,20 +190,24 @@ def team_season_filter(data_team_agg:pd.DataFrame,
 
     # ##### Season Filter Insights Home vs Away
     team_insight_data = data_agg[data_agg['Team'] == team]
-    if team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0] > team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]:
-        period_venue = ['Home', 'Away']
-        period_venue_1 = team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0]
-        period_venue_2 = team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]
-    else:
-        period_venue = ['Away', 'Home']
-        period_venue_1 = team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]
-        period_venue_2 = team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0]
+    period_venue = ""
+    period_venue_1 = np.nan
+    period_venue_2 = np.nan
+    if ("Home" in team_insight_data.dropna()['Season Filter'].values) and ("Away" in team_insight_data.dropna()['Season Filter'].values):
+        if team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0] > team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]:
+            period_venue = ['Home', 'Away']
+            period_venue_1 = team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0]
+            period_venue_2 = team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]
+        else:
+            period_venue = ['Away', 'Home']
+            period_venue_1 = team_insight_data[team_insight_data['Season Filter'] == 'Away'][stat_name].values[0]
+            period_venue_2 = team_insight_data[team_insight_data['Season Filter'] == 'Home'][stat_name].values[0]
 
     # ##### Season Filter Insights 1st Half vs 2nd Half
     period_insights = ""
     period_insights_1 = np.nan
     period_insights_2 = np.nan
-    if "2nd Half" in team_insight_data['Season Filter'].values:
+    if "2nd Half" in team_insight_data.dropna()['Season Filter'].values:
         if team_insight_data[team_insight_data['Season Filter'] == '1st Half'][stat_name].values[0] > team_insight_data[team_insight_data['Season Filter'] == '2nd Half'][stat_name].values[0]:
             period_insights = ['1st Half', '2nd Half']
             period_insights_1 = team_insight_data[team_insight_data['Season Filter'] == '1st Half'][stat_name].values[0]
@@ -220,7 +226,7 @@ def team_season_stats(data:pd.DataFrame,
                                          pd.DataFrame]:
 
     team_season_data = data.copy()
-    team_season_data.rename(columns={'Final Third':'Passes Final Third'}, inplace=True)
+    # team_season_data.rename(columns={'Final Third':'Passes Final Third'}, inplace=True)
 
     # ##### Filter Data Based on Team
     team_data_stats = team_season_data[team_season_data['Team'] == team].reset_index(drop=True)
@@ -230,50 +236,54 @@ def team_season_stats(data:pd.DataFrame,
     # ##### Stats Aggregation based on Season Filter
     filter_agg_data = filter_season_data(data=final_team_data)
 
-    team_filter_count = filter_season_data(data=team_data_stats)[season_filter].sum()
-    opponent_filter_count = filter_season_data(data=opponent_data_stats)[season_filter].sum()
+    team_filter_count = filter_season_data(data=team_data_stats)[config_season_filter.season_filter].sum()
+    opponent_filter_count = filter_season_data(data=opponent_data_stats)[config_season_filter.season_filter].sum()
 
-
+    # ##### Create Team / Opponent Count Stats
     season_team_stats = []
     season_opponent_stats = []
-    for filter in season_filter:
-        season_team_stats.append(list(filter_agg_data[(filter_agg_data['Team'] == team) & (filter_agg_data[filter] == 1)][stats_count_calculations].sum().values))
-        season_opponent_stats.append(list(filter_agg_data[(filter_agg_data['Opponent'] == team) & (filter_agg_data[filter] == 1)][stats_count_calculations].sum().values))
-    season_team_stats = pd.DataFrame(season_team_stats, columns=stats_count_calculations, index=season_filter)
-    season_opponent_stats = pd.DataFrame(season_opponent_stats, columns=stats_count_calculations, index=season_filter)
-    season_team_stats['Duel Aerial'] = season_team_stats['Duel Aerial Won'] + season_team_stats['Duel Aerial Lost']
-    season_opponent_stats['Duel Aerial'] = season_opponent_stats['Duel Aerial Won'] + season_opponent_stats['Duel Aerial Lost']
+    for filter in config_season_filter.season_filter:
+        season_team_stats.append(list(filter_agg_data[(filter_agg_data['Team'] == team) & (filter_agg_data[filter] == 1)][
+            config_team_stats.stats_count_calculations].sum().values))
+        season_opponent_stats.append(list(filter_agg_data[(filter_agg_data['Opponent'] == team) & (filter_agg_data[filter] == 1)][
+            config_team_stats.stats_count_calculations].sum().values))
+    season_team_stats = pd.DataFrame(season_team_stats, columns=config_team_stats.stats_count_calculations, index=config_season_filter.season_filter)
+    season_opponent_stats = pd.DataFrame(season_opponent_stats, columns=config_team_stats.stats_count_calculations, index=config_season_filter.season_filter)
+    season_team_stats['Aerial Duel'] = season_team_stats['Aerial Duel Won'] + season_team_stats['Aerial Duel Lost']
+    season_opponent_stats['Aerial Duel'] = season_opponent_stats['Aerial Duel Won'] + season_opponent_stats['Aerial Duel Lost']
 
     # ##### Aggregate % Stats
-    for stat in stats_perc_calculations.keys():
-        season_team_stats[stat] = season_team_stats[stats_perc_calculations[stat][1]] / season_team_stats[stats_perc_calculations[stat][0]] * 100
-        season_opponent_stats[stat] = season_opponent_stats[stats_perc_calculations[stat][1]] / season_opponent_stats[stats_perc_calculations[stat][0]] * 100
+    for stat in config_team_stats.stats_perc_calculations.keys():
+        season_team_stats[stat] = season_team_stats[config_team_stats.stats_perc_calculations[stat][1]] / season_team_stats[
+            config_team_stats.stats_perc_calculations[stat][0]] * 100
+        season_opponent_stats[stat] = season_opponent_stats[config_team_stats.stats_perc_calculations[stat][1]] / season_opponent_stats[
+            config_team_stats.stats_perc_calculations[stat][0]] * 100
 
     # ##### Final Processing for Team Statistics
-    season_team_stats.drop(columns=['Duel Aerial'], inplace=True)
-    season_team_stats[stats_count_calculations] = np.array(season_team_stats[stats_count_calculations]) / np.array(team_filter_count).reshape(-1,1)
+    season_team_stats.drop(columns=['Aerial Duel'], inplace=True)
+    season_team_stats[config_team_stats.stats_count_calculations] = np.array(season_team_stats[
+        config_team_stats.stats_count_calculations]) / np.array(team_filter_count).reshape(-1,1)
     season_team_stats = season_team_stats.T
-    season_team_stats = season_team_stats.reindex(stats_team)
+    season_team_stats = season_team_stats.reindex(config_team_stats.stats_team)
     season_team_stats = season_team_stats.reset_index(drop=False)
     season_team_stats.rename(columns={'index':'Stat'}, inplace=True)
-    season_team_stats.loc[season_team_stats['Stat'] == 'Final Third', 'Stat'] = 'Passes Final 3rd'
 
     # ##### Final Processing for Opponent Statistics
-    season_opponent_stats.drop(columns=['Duel Aerial'], inplace=True)
-    season_opponent_stats[stats_count_calculations] = np.array(season_opponent_stats[stats_count_calculations]) / np.array(opponent_filter_count).reshape(-1,1)
+    season_opponent_stats.drop(columns=['Aerial Duel'], inplace=True)
+    season_opponent_stats[config_team_stats.stats_count_calculations] = np.array(season_opponent_stats[
+        config_team_stats.stats_count_calculations]) / np.array(opponent_filter_count).reshape(-1,1)
     season_opponent_stats = season_opponent_stats.T
-    season_opponent_stats = season_opponent_stats.reindex(stats_team)
+    season_opponent_stats = season_opponent_stats.reindex(config_team_stats.stats_team)
     season_opponent_stats = season_opponent_stats.reset_index(drop=False)
     season_opponent_stats.rename(columns={'index':'Stat'}, inplace=True)
-    season_opponent_stats.loc[season_opponent_stats['Stat'] == 'Final Third', 'Stat'] = 'Passes Final 3rd'
 
-    season_team_stats = season_team_stats.round(2)
     return season_team_stats, season_opponent_stats
 
 def team_page(data:pd.DataFrame, 
               data_all:pd.DataFrame, 
               page_season:str, 
-              favourite_team:str) -> st:
+              favourite_team:str,
+              season_teams:list) -> st:
     config = {'displayModeBar': False}
 
     # #### Team Statistics Type
@@ -281,8 +291,9 @@ def team_page(data:pd.DataFrame,
                                       options=["Season", "Team vs Team", "Last 5 Seasons"])
     # ##### Select Stat
     filter_stat = st.sidebar.selectbox(label="Select Stat", 
-                                         options=stats_team)
+                                         options=config_team_stats.stats_team)
 
+    # ##### Season Team Statistics
     if stats_type == "Season":
 
         # ##### Extract Most Important Season Stats and comparison to last years stats
@@ -296,8 +307,8 @@ def team_page(data:pd.DataFrame,
         st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Season Stats</h4>', unsafe_allow_html=True)
         logo_col, metric_col_1, metric_col_2, metric_col_3, metric_col_4, metric_col_5, metric_col_6, metric_col_7  = st.columns([1,1.25,1.25,1.25,1.25,1.25,1.25, 1.25])
         with logo_col:
-             st.image(team_logos_config[favourite_team])
-        
+             st.image(config_teams_images['config_teams_logo'][favourite_team])
+
         metric_col_1.metric(label="Goals", value=f"{season_important_stats[5]}", delta=f"{diff_important_stats[5]}")
         metric_col_2.metric(label="Goals Ag", value=f"{season_important_stats[6]}", delta=f"{diff_important_stats[6]}", delta_color="inverse")
         metric_col_3.metric(label='xG', value=f"{season_important_stats[0]}", delta=f"{diff_important_stats[0]}")
@@ -309,7 +320,8 @@ def team_page(data:pd.DataFrame,
 
         if diff_important_stats[0] != "":
             st.markdown(
-                f"<b>Note:</b> <b><font color = #d20614>{page_season}</font></b> vs <b><font color = #d20614>{previous_seasons[page_season]}</font></b> Season comparison", unsafe_allow_html=True)
+                f"<b>Note:</b> <b><font color = #43C673>{page_season}</font></b> vs <b><font color = #d20614>{previous_seasons[page_season]}</font></b> "
+                f"Season comparison", unsafe_allow_html=True)
 
         # ##### Team Match Day Stats
         st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Match Day Stats</h4>', unsafe_allow_html=True)
@@ -317,25 +329,28 @@ def team_page(data:pd.DataFrame,
         match_day_fig, avg_team, avg_opp, better, stat_sig_name = teams_day_analysis(data=data,
                                            team=favourite_team,
                                            stat_name=filter_stat)
-        st.plotly_chart(match_day_fig, config=config, use_container_width=True)
+        if match_day_fig is not None:
+            st.plotly_chart(match_day_fig, config=config, use_container_width=True)
+            # ##### Match Day Insights
+            if stat_sig_name == "":
+                st.markdown(
+                    f"In <b><font color = #d20614>{better}%</font></b> of the <b><font color = #d20614>{page_season}"
+                    f"</font></b> Season games {favourite_team} had more <b><font color = #43C673>{filter_stat}</font></b> "
+                    f"then her opponent. {favourite_team} had an average of <b><font color = #d20614>{avg_team}</font></b> "
+                    f"<b><font color = #43C673>{filter_stat}</font></b> per game while her opponents had an average of "
+                    f"<b><font color = #d20614>{avg_opp}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per "
+                    f"game.", unsafe_allow_html=True)
+            else:
+                st.markdown(
+                    f"In <b><font color = #d20614>{better}%</font></b> of the <b><font color = #d20614>{page_season}"
+                    f"</font></b> Season games {favourite_team} had more <b><font color = #43C673>{filter_stat}</font></b> then"
+                    f" her opponent. {favourite_team} had an average of <b><font color = #d20614>{avg_team}</font></b> <b>"
+                    f"<font color = #43C673>{filter_stat}</font></b> per game while her opponents had an average of "
+                    f"<b><font color = #d20614>{avg_opp}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per "
+                    f"game, which is <b><font color = #d20614>{stat_sig_name}</font></b>.", unsafe_allow_html=True)
 
-        # ##### Match Day Insights
-        if stat_sig_name == "":
-            st.markdown(
-                f"In <b><font color = #d20614>{better}%</font></b> of the <b><font color = #d20614>{page_season}"
-                f"</font></b> Season games {favourite_team} had more <b><font color = green>{filter_stat}</font></b> "
-                f"then her opponent. {favourite_team} had an average of <b><font color = #d20614>{avg_team}</font></b> "
-                f"<b><font color = green>{filter_stat}</font></b> per game while her opponents had an average of "
-                f"<b><font color = #d20614>{avg_opp}</font></b> <b><font color = green>{filter_stat}</font></b> per "
-                f"game.", unsafe_allow_html=True)
         else:
-            st.markdown(
-                f"In <b><font color = #d20614>{better}%</font></b> of the <b><font color = #d20614>{page_season}"
-                f"</font></b> Season games {favourite_team} had more <b><font color = green>{filter_stat}</font></b> then"
-                f" her opponent. {favourite_team} had an average of <b><font color = #d20614>{avg_team}</font></b> <b>"
-                f"<font color = green>{filter_stat}</font></b> per game while her opponents had an average of "
-                f"<b><font color = #d20614>{avg_opp}</font></b> <b><font color = green>{filter_stat}</font></b> per "
-                f"game, which is <b><font color = #d20614>{stat_sig_name}</font></b>.", unsafe_allow_html=True)
+            st.markdown(f'<h6><font color = #d20614>{favourite_team}</font> has 0 <font color = #d20614>{filter_stat}</font></h4>', unsafe_allow_html=True)
 
         # ##### Team Season Filter Statistics
         season_team_stats, season_opponent_stats = team_season_stats(data=data,
@@ -349,25 +364,27 @@ def team_page(data:pd.DataFrame,
                                             data_opp_agg=season_opponent_stats, 
                                             team=favourite_team, 
                                             stat_name=filter_stat)
-            st.plotly_chart(fig_type_team, config=config, use_container_width=True)
+            if match_day_fig is not None:
+                st.plotly_chart(fig_type_team, config=config, use_container_width=True)
 
         with insights_col:
             st.title("")
-            st.markdown(
-                f"<b><font color = #d20614>{favourite_team}</font></b> performs much better at <b><font color = #d20614>"
-                f"{period_venue[0]}</font></b> Games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
-                f"<font color = green>{filter_stat}</font></b> per Game on average in comparison to <b><font color = "
-                f"#d20614>{period_venue[1]}</font></b> Games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
-                f"</font></b> <b><font color = green>{filter_stat}</font></b> per Game on average.",
-                unsafe_allow_html=True)
+            if period_venue != "":
+                st.markdown(
+                    f"<b><font color = #d20614>{favourite_team}</font></b> performs much better at <b><font color = #d20614>"
+                    f"{period_venue[0]}</font></b> Games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
+                    f"<font color = #43C673>{filter_stat}</font></b> per Game on average in comparison to <b><font color = "
+                    f"#d20614>{period_venue[1]}</font></b> Games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
+                    f"</font></b> <b><font color = #43C673>{filter_stat}</font></b> per Game on average.",
+                    unsafe_allow_html=True)
 
             if period_insights != "":
                 st.markdown(
                     f"It also performs much better in the <b><font color = #d20614>{period_insights[0]}</font></b> "
-                    f"Season Games with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = green>"
+                    f"Season Games with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = #43C673>"
                     f"{filter_stat}</font></b> per Game on average in comparison to the <b><font color = #d20614>"
                     f"{period_insights[1]}</font></b> Season Games where they had  <b><font color = #d20614>"
-                    f"{period_insights_2:.2f}</font></b> <b><font color = green>{filter_stat}</font></b> per Game on average.",
+                    f"{period_insights_2:.2f}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per Game on average.",
                     unsafe_allow_html=True)
         
         # ##### Show Team or Opponent Stats
@@ -378,8 +395,8 @@ def team_page(data:pd.DataFrame,
         
         pos_stat = season_team_stats[season_team_stats['Stat'] == filter_stat].index.values[0]
         if show_team == f"{favourite_team} Stats":
-            st.dataframe(season_team_stats.style.format({stat: '{:.2f}' for stat in ['Season' ,'Form' ,'Home' ,'Away' ,'1st Half' ,'2nd Half' ,'Win' ,'Draw' ,'Defeat']}).apply(lambda x: ['background-color: #ffffff' if i % 2 == 0 
-                                                                           else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
+            st.dataframe(season_team_stats.style.format({stat: '{:.2f}' for stat in config_season_filter.season_filter}).apply(lambda x: [
+                'background-color: #ffffff' if i % 2 == 0 else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
                 lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
                             use_container_width=True, 
                             hide_index=True,
@@ -387,11 +404,20 @@ def team_page(data:pd.DataFrame,
                             "Stat": st.column_config.Column(
                                 width="medium")})
         else:
-            st.dataframe(data=season_opponent_stats.style.format({stat: '{:.2f}' for stat in ['Season' ,'Form' ,'Home' ,'Away' ,'1st Half' ,'2nd Half' ,'Win' ,'Draw' ,'Defeat']}).apply(lambda x: ['background-color: #ffffff' if i % 2 == 0 
-                                                                           else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
+            st.dataframe(data=season_opponent_stats.style.format({stat: '{:.2f}' for stat in config_season_filter.season_filter}).apply(lambda x: [
+                'background-color: #ffffff' if i % 2 == 0 else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
                 lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
                             use_container_width=True, 
                             hide_index=True,
                             column_config={
                             "Stat": st.column_config.Column(
                                 width="medium")})
+            
+    # ##### Season Team vs Team Statistics
+    elif stats_type == "Team vs Team":
+        
+        # ##### Select Opponent
+        opponent_teams = season_teams.copy()
+
+        vs_team = st.sidebar.selectbox(label="Select Opponent", 
+                                             options=opponent_teams)

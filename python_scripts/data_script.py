@@ -16,7 +16,7 @@ def init_connection():
 supabase = init_connection()
 
 # ########## Retrieve Season Info
-st.cache_data(ttl=3600)
+st.cache_data
 def retrieve_season_info(table:str) -> tuple[pd.DataFrame, 
                                              pd.DataFrame]:
     """ Available Seasons querry """
@@ -26,9 +26,10 @@ def retrieve_season_info(table:str) -> tuple[pd.DataFrame,
     """ Game Stats and Events Stats Seasons """
     all_seasons = list(data['Season'].unique())
     game_stats_seasons = all_seasons[-5:]
-    events_season = all_seasons[-1]
+    all_seasons_id = list(data['Season'].unique())
+    game_id_seasons = all_seasons_id[-5:]
 
-    return game_stats_seasons, events_season
+    return game_stats_seasons, game_id_seasons
 
 # #################################################################################################### Game Stats Analysis
 # ########## Retrieve Season Teams
@@ -48,7 +49,7 @@ def retrieve_season_teams(table:str,
 
 
 # ########## Retrieve Season Data
-st.cache_data(ttl=3600)
+st.cache_data
 def retrieve_season_data(table:str, 
                          season:str) -> pd.DataFrame:
     """ Return Season Data """
@@ -59,7 +60,7 @@ def retrieve_season_data(table:str,
 
 
 # # ########## Retrieve Last 5 Seasons Data
-st.cache_data(ttl=3600)
+st.cache_data
 def retrieve_all_seasons_data(table:str, 
                               team:str, 
                               seasons:str, 
@@ -70,11 +71,13 @@ def retrieve_all_seasons_data(table:str,
     all_seasons_data = all_seasons_data[all_seasons_data['Season'].isin(seasons)].reset_index(drop=True)
 
     if team_analysis:
-        data_opponent_query = supabase.table(table).select('Season, Goals, Own Goals').eq('Opponent', team).execute().data
+        data_opponent_query = supabase.table(table).select('Season', 'Week_No', 'Goals').eq('Opponent', team).execute().data
         opponent_seasons_data = pd.DataFrame(data_opponent_query)
         opponent_seasons_data = opponent_seasons_data[opponent_seasons_data['Season'].isin(seasons)].reset_index(drop=True)
-        all_seasons_data['Goals'] = all_seasons_data['Goals'] + opponent_seasons_data['Own Goals']
-        all_seasons_data['Goals Ag'] = all_seasons_data['Own Goals'] + opponent_seasons_data['Goals']
+        opponent_seasons_data.rename(columns={'Goals':'Goals Ag'}, inplace=True)
+        all_seasons_data = pd.merge(left=all_seasons_data,
+                                    right=opponent_seasons_data,
+                                    on=['Season', 'Week_No'])
 
     return all_seasons_data
 

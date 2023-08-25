@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_scripts.game_stats_utils import match_stats_config, team_logos_config, team_stadiums_config, process_team_data
+from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, config_match_day_stats
 
 # ##### Process Match Day Stats Incons
 def stat_name_icon(stats:str) -> list:
@@ -18,6 +18,7 @@ def match_day_stats(data:pd.DataFrame,
                     away_team:str, 
                     stats:str, 
                     venue:str) -> list:
+
     if venue == "Home":
         day_stats = data[(data['Team'] == home_team) & (data['Opponent'] == away_team) &
                          (data['Venue'] == venue)][stats].values[0]
@@ -27,10 +28,10 @@ def match_day_stats(data:pd.DataFrame,
 
     game_stats = []
     for i in range(len(day_stats)):
-        if stats[i] in ["Possession", "Duel Aerial Won %", "Shot Accuracy %", "Dribbles %", "Tackles Won %",
-                        "Saves %", "Crosses Stopped %", "Pass %", "Pass Short %", "Pass Medium %", "Pass Long %"]:
+        if stats[i] in ["Possession", "% of Aerial Duel Won", "Shot Accuracy %", "Dribbles %", "Tackles Won %", "Saves %", "Crosses Stopped %", "Passes Completed %", 
+                        "Pass Short Completed %", "Pass Medium Completed %", "Pass Long Completed %"]:
             game_stats.append(st.markdown(f"<p style='text-align: center;'p>{day_stats[i] / 100:.1%}", unsafe_allow_html=True))
-        elif stats[i] in ["Distance Covered (Km)", "xGoal", "Post-Shot xGoal"]:
+        elif stats[i] in ["Distance Covered (Km)", "xGoal", "xAssist", "Post-Shot xGoal"]:
             game_stats.append(st.markdown(f"<p style='text-align: center;'p>{day_stats[i]:.1f}", unsafe_allow_html=True))
         elif stats[i] in ['Manager', 'Lineup']:
             st.markdown(f"<p style='text-align: center;'p>{day_stats[i]}", unsafe_allow_html=True)
@@ -97,14 +98,14 @@ def match_day_page(data:pd.DataFrame,
     # ##### Home/Away Team Logo
     match_day_col, home_logo_col, _, away_logo_col, _ = st.columns([2.75, 3, 0.9, 3, 0.3])
     with home_logo_col:
-        st.image(team_logos_config[home_team])
+        st.image(config_teams_images['config_teams_logo'][home_team])
 
     with away_logo_col:
-        st.image(team_logos_config[away_team])
+        st.image(config_teams_images['config_teams_logo'][away_team])
 
     # ##### Match Day Statistic Sype
     stats_option = st.sidebar.selectbox(label="Statistics", 
-                                        options=match_stats_config['stat_name'])
+                                        options=config_match_day_stats.stat_name)
 
     # ##### Home/Away Score
     _, home_score, _, away_score, _ = st.columns([1.25, 2, 0.25, 2, 0.25])
@@ -123,28 +124,28 @@ def match_day_page(data:pd.DataFrame,
 
     # ##### Statistics Type Config
     icon_col, stat_name_col, home_stat_col, away_stat_col = st.columns([0.25, 1.25, 2.25, 3])
-    stat_selection = match_stats_config['stat_name'].index(stats_option)
+    stat_selection = config_match_day_stats.stat_name.index(stats_option)
 
     # ##### Stat Option
     with match_day_col:
         st.markdown(" ")
-        st.markdown(f"<h5 style='text-align: center;'p><font color = #d20614>{match_stats_config['stat_name'][stat_selection]}</font> Stats</h5>", unsafe_allow_html=True)
+        st.markdown(f"<h5 style='text-align: center;'p><font color = #d20614>{config_match_day_stats.stat_name[stat_selection]}</font> Stats</h5>", unsafe_allow_html=True)
         st.markdown(f"<p style='text-align: center;'p>Match Day: <b>{match_day}</b></p>", unsafe_allow_html=True)
-
+    
     # ##### Stat Icon
     with icon_col:
-        stat_name_icon(stats=match_stats_config["stat_emoji"][stat_selection])
+        stat_name_icon(stats=config_match_day_stats.stat_emoji[stat_selection])
 
     # ##### Stat Name
     with stat_name_col:
-        stat_name_icon(stats=match_stats_config['stat_type'][stat_selection])
+        stat_name_icon(stats=config_match_day_stats.stat_type[stat_selection])
 
     # ##### Stat Home Team
     with home_stat_col:
         match_day_stats(data=season_buli_df,
                         home_team=home_team,
                         away_team=away_team,
-                        stats=match_stats_config['stat_type'][stat_selection],
+                        stats=config_match_day_stats.stat_type[stat_selection],
                         venue="Home")
         
     # ##### Stat Away Team
@@ -152,22 +153,22 @@ def match_day_page(data:pd.DataFrame,
         match_day_stats(data=season_buli_df,
                         home_team=home_team,
                         away_team=away_team,
-                        stats=match_stats_config['stat_type'][stat_selection],
+                        stats=config_match_day_stats.stat_type[stat_selection],
                         venue="Away")
 
     # ##### Stadium Info
     _, stadium_logo_col, stadium_name_col, _ = st.columns([3.5, 0.9, 2.25, 1])
     with stadium_logo_col:
-        st.image(team_stadiums_config[home_team][0], width=55)
+        st.image(config_teams_images['config_team_stadiums'][home_team][0], width=55)
 
     with stadium_name_col:
         st.markdown("")
         if home_team == "Sport-Club Freiburg":
             if page_season in ['2022-2023', '2023-2024']:
-                st.markdown(f"<i>{team_stadiums_config[home_team][2]}</i>", unsafe_allow_html=True)
+                st.markdown(f"<i>{config_teams_images['config_team_stadiums'][home_team][2]}</i>", unsafe_allow_html=True)
             elif home_team == "Sport-Club Freiburg" and page_season=='2021-2022' and match_day > 6:
-                st.markdown(f"<i>{team_stadiums_config[home_team][2]}</i>", unsafe_allow_html=True)
+                st.markdown(f"<i>{config_teams_images['config_team_stadiums'][home_team][2]}</i>", unsafe_allow_html=True)
             else:
-                st.markdown(f"<i>{team_stadiums_config[home_team][1]}</i>", unsafe_allow_html=True)
+                st.markdown(f"<i>{config_teams_images['config_team_stadiums'][home_team][1]}</i>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<i>{team_stadiums_config[home_team][1]}</i>", unsafe_allow_html=True)
+            st.markdown(f"<i>{config_teams_images['config_team_stadiums'][home_team][1]}</i>", unsafe_allow_html=True)

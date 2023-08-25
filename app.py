@@ -2,7 +2,7 @@ import streamlit as st
 from supabase import create_client
 from PIL import Image
 from streamlit_option_menu import option_menu
-from python_scripts.game_stats_scripts.game_stats_utils import info_tab
+from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info
 from python_scripts.data_script import retrieve_season_info, retrieve_season_teams
 from python_scripts.game_stats_app import game_stats_analysis
 
@@ -13,7 +13,7 @@ def main() -> st:
     st.sidebar.image(Image.open('images/Bundesliga.png'))
 
     # ##### Available Seasons
-    last_5_seasons, events_season = retrieve_season_info(table=info_tab)
+    last_5_seasons, last_5_seasons_id = retrieve_season_info(table=supabase_tab_info.info_tab)
 
     # ##### Set Application Name and Options
     st.markdown(f"<h1><font color = #d20614>Bundesliga</font> Application</h1>", unsafe_allow_html=True)
@@ -32,35 +32,32 @@ def main() -> st:
                                     "nav-link": {"--hover-color": "#ffffff"},
                                 })
 
+    # ##### Select Season
+    season_selected = st.sidebar.selectbox(label="Select Season",
+                                            options=last_5_seasons,
+                                            index=4)
+
+    # ##### Select Favourite Team
+    available_teams, pos_index = retrieve_season_teams(table=supabase_tab_info.info_tab,
+                                                       season=season_selected)
+    favourite_team = st.sidebar.selectbox(label="Select Team", 
+                                          options=available_teams, 
+                                          index=pos_index)
+
     # ##### Game Stats Analysis
     if app_selection == "Game Statistics":
-        # ##### Select Season
-        season_selected = st.sidebar.selectbox(label="Select Season",
-                                               options=last_5_seasons,
-                                               index=4)
 
-        # ##### Select Favourite Team
-        available_teams, pos_index = retrieve_season_teams(table=info_tab,
-                                                           season=season_selected)
-        favourite_team = st.sidebar.selectbox(label="Select Favourite Team",
-                                              options=available_teams,
-                                              index=pos_index)
-        
         # ##### Game Stats Page
         game_stats_analysis(team=favourite_team,
+                            season_teams=available_teams,
                             season=season_selected,
                             last_5_seasons=last_5_seasons)
 
     # ##### Game Events Analysis
     elif app_selection == "Game Events":
-
-        # ##### Select Favourite Team
-        available_teams, pos_index = retrieve_season_teams(season=events_season)
-        favourite_team = st.sidebar.selectbox(label="Select Favourite Team",
-                                              options=available_teams,
-                                              index=pos_index)
         
         # ##### Game Events Analysis
+        pass
 
     # ##### App Source Info
     with st.expander(label="Data Source"):
