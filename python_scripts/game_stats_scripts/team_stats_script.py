@@ -46,9 +46,6 @@ def most_important_stats(data:pd.DataFrame,
         diff_important_stats[:4] = np.round(diff_important_stats[:4],2)
     else:
         diff_important_stats = ["", "", "", "", "", "", ""]
-        
-    # else:
-    #     diff_important_stats = ["", "", "", "", "", "", ""]
 
     return season_important_stats, diff_important_stats
 
@@ -268,13 +265,15 @@ def team_season_stats(data:pd.DataFrame,
 
 
 def last_games_results(data:pd.DataFrame,
-                       team_opponent=str) -> pd.DataFrame:
+                       team_opponent:str,
+                       season_filter:str) -> pd.DataFrame:
     seasons_data = data.copy()
     # ##### Filter Only Team and Opponent Games
-    games_opponent = seasons_data[seasons_data['Opponent'] == team_opponent].sort_values(by=['Season Id', 'Week_No'], ascending=[False, False])
+    games_opponent = seasons_data[(seasons_data['Opponent'] == team_opponent) & 
+                                  (seasons_data['Season Id'] <= config_previous_seasons.season_id[season_filter] + 1)].sort_values(by=['Season Id', 'Week_No'], ascending=[False, False])
 
     # ##### Get Last 5 Games Played
-    last_5_games_df = games_opponent.iloc[:5,:][['Season', 'Week_No', 'Venue', 'Team', 'Opponent', 'Goals', 'Goals Ag']]
+    last_5_games_df = games_opponent.iloc[:5,:][['Season Id', 'Week_No', 'Venue', 'Team', 'Opponent', 'Goals', 'Goals Ag']]
 
     # ##### Create Last 5 Games
     change_opponent = last_5_games_df.loc[last_5_games_df['Venue'] == 'Away',['Opponent','Team']]
@@ -284,8 +283,10 @@ def last_games_results(data:pd.DataFrame,
     last_5_games_df.loc[last_5_games_df['Venue'] == 'Away', 'Goals'] = change_goals['Goals Ag']
     last_5_games_df.loc[last_5_games_df['Venue'] == 'Away', 'Goals Ag'] = change_goals['Goals']
     last_5_games_df['Result'] = last_5_games_df['Goals'].astype(str) + '-' + last_5_games_df['Goals Ag'].astype(str)
-    last_5_games_df = last_5_games_df[['Season', 'Week_No', 'Team', 'Result', 'Opponent']]
-    last_5_games_df.rename(columns={'Week_No':'Week No', 'Team':'Home Team', 'Opponent':'Away Team'}, inplace=True)
+    last_5_games_df = last_5_games_df[['Season Id', 'Week_No', 'Team', 'Result', 'Opponent']]
+    last_5_games_df['Season Id'] = last_5_games_df['Season Id'].map(dict((int(value+1), key) for key, value in config_previous_seasons.season_id.items()))
+
+    last_5_games_df.rename(columns={'Season Id':'Season', 'Week_No':'Week No', 'Team':'Home Team', 'Opponent':'Away Team'}, inplace=True)
     
     return last_5_games_df
 
@@ -308,14 +309,14 @@ def radar_plot(stats:list,
                     title_space=0, endnote_space=0, grid_key='radar', axis=False)
 
     radar.setup_axis(ax=axs['radar'], facecolor='None')
-    rings_inner = radar.draw_circles(ax=axs['radar'], facecolor='#e5e5e6', edgecolor='#d20614')
+    rings_inner = radar.draw_circles(ax=axs['radar'], facecolor='#e5e5e6', edgecolor='#ffffff')
     radar_output = radar.draw_radar(stats, ax=axs['radar'],
                                     kwargs_radar={'facecolor': '#d20614', 'alpha': 0.25},
                                     kwargs_rings={'facecolor': '#ffffff', 'alpha': 0.25})
 
     radar_poly, rings_outer, vertices = radar_output
     range_labels = radar.draw_range_labels(ax=axs['radar'], fontsize=10, color='#000000', font="Sans serif")
-    param_labels = radar.draw_param_labels(ax=axs['radar'], fontsize=15, color='#000000', font="Sans serif")
+    param_labels = radar.draw_param_labels(ax=axs['radar'], fontsize=12.5, color='#000000', font="Sans serif")
     axs['radar'].scatter(vertices[:, 0], vertices[:, 1],  c='#d20614', edgecolors='#000000', marker='o', s=100)
 
     return radar_fig
@@ -361,11 +362,11 @@ def comparison_all_stats(data:pd.DataFrame,
     insight_df = season_team_data['Sig'].value_counts().reset_index(drop=False)
     insight_data = []
     try: 
-        insight_data.append(insight_df[insight_df['index'] == "🟢"]['Sig'].values[0]),
+        insight_data.append(insight_df[insight_df['Sig'] == "🟢"]['count'].values[0]),
     except:
         insight_data.append(0)
     try: 
-        insight_data.append(insight_df[insight_df['index'] == "🔴"]['Sig'].values[0]),
+        insight_data.append(insight_df[insight_df['Sig'] == "🔴"]['count'].values[0]),
     except:
         insight_data.append(0)
 
@@ -474,7 +475,7 @@ def team_page(data:pd.DataFrame,
         if diff_important_stats[0] != "":
             st.markdown(
                 f"<b>Note:</b> <b><font color = #43C673>{page_season}</font></b> vs <b><font color = #d20614> "
-                f"{config_previous_seasons.season_name[page_season]}</font></b> Season comparison", unsafe_allow_html=True)
+                f"{config_previous_seasons.season_comparison[page_season]}</font></b> Season comparison", unsafe_allow_html=True)
 
         # ##### Team Match Day Stats
         st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Match Day Stats</h4>', unsafe_allow_html=True)
@@ -587,7 +588,8 @@ def team_page(data:pd.DataFrame,
         
         # ##### Latest Games Results
         latest_results = last_games_results(data=data_all,
-                                            team_opponent=opponent_team)
+                                            team_opponent=opponent_team,
+                                            season_filter=page_season)
         if latest_results.shape[0] > 0:
             games_txt = 'Games' if latest_results.shape[0] > 1 else 'Game'
             st.markdown(f'<h4><font color = #d20614>{favourite_team}</font> vs {opponent_team} - Last <b><font color = #d20614>{latest_results.shape[0]}</font> '
@@ -604,11 +606,12 @@ def team_page(data:pd.DataFrame,
                         })
         else:
             st.markdown(f'<h4><font color = #d20614>{favourite_team}</font> vs {opponent_team}</h4>', unsafe_allow_html=True)
-            st.markdown("First meeting over the last 3 Seasons")
+            st.markdown("No meeting during the last 3 Seasons")
 
 
         # ##### Team vs Opponent Stats Type Comparison
-        st.markdown(f'<h4><font color = #d20614>{favourite_team}</font> vs {opponent_team} <font color = #d20614>{filter_season}</font> Statistics</h4>', unsafe_allow_html=True)
+        st.markdown(f'<h4><font color = #d20614>{favourite_team}</font> vs {opponent_team} <font color = #d20614>{filter_season}</font> Statistics - '
+                    f'<font color = #d20614>{page_season}</font></h4>', unsafe_allow_html=True)
 
         team_radar, opponent_radar, stat_comparison, comparison_insight = team_stats_comparison(data=data, 
                                                                                                 team=favourite_team, 
