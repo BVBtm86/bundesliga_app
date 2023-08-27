@@ -4,7 +4,7 @@ from python_scripts.data_script import retrieve_season_data, retrieve_all_season
 from python_scripts.game_stats_scripts.day_stats_script import match_day_page
 from python_scripts.game_stats_scripts.table_stats_script import table_page
 from python_scripts.game_stats_scripts.team_stats_script import team_page
-from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info, process_team_data, process_goals_opponent
+from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
 
 def game_stats_analysis(team:str, 
                         season_teams:list,
@@ -17,8 +17,9 @@ def game_stats_analysis(team:str,
     season_gk_data = retrieve_season_data(table=supabase_tab_info.gk_stas_tab,
                                           season=season)
 
-    season_data = process_goals_opponent(data=process_team_data(data=season_team_data, 
-                                                                data_gk=season_gk_data))
+    season_data = filter_season_data(data=process_goals_opponent(
+        data=process_team_data(
+        data=season_team_data, data_gk=season_gk_data)))
     
     # ##### Page Description
     st.markdown(
@@ -65,8 +66,9 @@ def game_stats_analysis(team:str,
                                                         seasons=last_5_seasons)
         
         # ##### Process Last 5 Seasons Data
-        all_seasons_data = process_team_data(data=all_seasons_team_data, 
-                                             data_gk=all_seasons_gk_data)
+        all_seasons_data = filter_season_data(
+            data=process_team_data(
+            data=all_seasons_team_data, data_gk=all_seasons_gk_data))
         team_page(data=season_data,
                   data_all=all_seasons_data,
                   page_season=season,

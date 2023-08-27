@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import streamlit as st
 from ml_collections import config_dict
 
@@ -167,13 +168,38 @@ team_stats_dict = {
 config_team_stats = config_dict.ConfigDict(team_stats_dict)
 
 # ##### Previous Season for Each Current Season
-previous_seasons = {'2020-2021':'2019-2020', 
-                    '2021-2022':'2020-2021', 
-                    '2022-2023':'2021-2022',
-                    '2023-2024':'2022-2023'}
+previous_seasons_dict = {
+     'season_name': {'2018-2019':'2017-2018',
+                     '2019-2020':'2018-2019', 
+                     '2020-2021':'2019-2020',
+                     '2021-2022':'2020-2021', 
+                     '2022-2023':'2021-2022',
+                     '2023-2024':'2022-2023'},
+    'season_id':{'2018-2019':1,
+                 '2019-2020':2, 
+                 '2020-2021':3,
+                 '2021-2022':4, 
+                 '2022-2023':5,
+                 '2023-2024':6}}
+config_previous_seasons = config_dict.ConfigDict(previous_seasons_dict)
+
+# ##### Comparison Statistics
+comparison_stats_dict = {
+     # #### Main Stats
+     'stats_name': ["General", "Offensive", "Defensive", "Passing"],
+     'stats_list': {"General": ["Distance Covered (Km)", "Sprints", "Possession", "% of Aerial Duel Won", "Offsides", 
+                                "Corner Kicks", "Fouls Committed", "Fouls Drawn", "Yellow Cards", "Red Cards"],
+                    "Offensive": ["xGoal", 'xAssist', "Assists", "Key Passes", "Shots", "Shots on Target", "Shot Accuracy %", 
+                                  "Blocked Shots", "Take-Ons Attempted", "Successful Take-On %"],
+                    "Defensive": ["Tackles", "Tackles Won %", 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd',
+                                  "Clearances", "Interceptions", "Ball Recoveries", "Blocks", "Errors"],
+                    "Passing": ["Touches", "Passes", "Passes Completion %", "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", 
+                                "Passes into Final 3rd", "Passes into Penalty Area", "Crosses", "Crosses into Penalty Area"]}
+                                }   
+config_comparison_stats = config_dict.ConfigDict(comparison_stats_dict)
 
 # ##### Process Bundesliga Team and Gk Data
-st.cache_data(ttl=3600)
+st.cache_data
 def process_team_data(data:pd.DataFrame, 
                       data_gk:pd.DataFrame) -> pd.DataFrame:
     # ##### Read Data
@@ -224,7 +250,7 @@ def process_goals_opponent(data:pd.DataFrame) -> pd.DataFrame:
 
 
 # ##### Process Season Bundesliga Data
-st.cache_data(ttl=3600)
+st.cache_data
 def filter_season_data(data:pd.DataFrame) -> pd.DataFrame:
     buli_df = data.copy()
 
@@ -270,3 +296,19 @@ def style_metric_cards(background_color: str = "#e5e5e6",
             """,
             unsafe_allow_html=True,
         )
+
+def radar_mosaic(radar_height=0.500, title_height=0, figheight=2):
+    if title_height + radar_height > 1:
+        error_msg = 'Reduce one of the radar_height or title_height so the total is ≤ 1.'
+        raise ValueError(error_msg)
+    endnote_height = 1 - title_height - radar_height
+    figwidth = figheight * radar_height
+    figure, axes = plt.subplot_mosaic([['title'], ['radar'], ['endnote']],
+                                      gridspec_kw={'height_ratios': [title_height, radar_height,
+                                                                     endnote_height],
+                                                   'bottom': 0, 'left': 0, 'top': 1,
+                                                   'right': 1, 'hspace': 0},
+                                      figsize=(figwidth, figheight))
+    axes['title'].axis('off')
+    axes['endnote'].axis('off')
+    return figure, axes
