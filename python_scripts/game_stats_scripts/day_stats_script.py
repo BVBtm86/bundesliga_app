@@ -28,8 +28,8 @@ def match_day_stats(data:pd.DataFrame,
 
     game_stats = []
     for i in range(len(day_stats)):
-        if stats[i] in ["Possession", "% of Aerial Duel Won", "Shot Accuracy %", "Dribbles %", "Tackles Won %", "Saves %", "Crosses Stopped %", "Passes Completed %", 
-                        "Pass Short Completed %", "Pass Medium Completed %", "Pass Long Completed %"]:
+        if stats[i] in ["Possession", "% of Aerial Duel Won", "Shot Accuracy %", "Tackles Won %", "Saves %", "Gk Crosses Stoped %", "Passes Completion %", 
+                        "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", "Successful Take-On %"]:
             game_stats.append(st.markdown(f"<p style='text-align: center;'p>{day_stats[i] / 100:.1%}", unsafe_allow_html=True))
         elif stats[i] in ["Distance Covered (Km)", "xGoal", "xAssist", "Post-Shot xGoal"]:
             game_stats.append(st.markdown(f"<p style='text-align: center;'p>{day_stats[i]:.1f}", unsafe_allow_html=True))

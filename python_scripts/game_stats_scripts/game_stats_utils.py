@@ -84,29 +84,29 @@ config_season_filter = config_dict.ConfigDict(season_filter_dict)
 # ##### Match Day Stats
 match_day_dict = {
      # ##### General Statistics
-    'general_stats': ["Manager", "Lineup", "Distance Covered (Km)", "Sprints", "Possession", "% of Aerial Duel Won", "Offsides", "Corner Kicks", "Fouls Committed", 
-                      "Fouls Drawn", "Yellow Cards", "Red Cards"],
-    'general_emoji': ["👨‍💼", "📏", "🚄", "🏃‍", "⚽", "🤼‍", "🚫", "📐", "🤒", "🤒", "🟨", "🟥"],
+    'general_stats': ["Manager", "Lineup", "Distance Covered (Km)", "Sprints", "Possession", "% of Aerial Duel Won", "Offsides", 
+                      "Corner Kicks", "Fouls Committed", "Fouls Drawn", "Yellow Cards", "Red Cards"],
+    'general_emoji': ["👨‍💼", "📏", "🚄", "🏃‍", "⚽", "🤼‍", "🚫", "📐", "⛔", "🤒", "🟨", "🟥"],
 
     # ##### Offensive Statistics
-    'offensive_stats': ["xGoal", 'xAssist', "Assists", "Key Passes", "Shots", "Shots on Target", "Shot Accuracy %", "Blocked Shots", "Take-Ons Attempted", 
-                        "Successful Take-On %"],
-    'offensive_emoji': ["⚽", "🤝", "🤝", "🔑", "👟", "🥅", "🎯", "🚫", "⛹️", "✅"],
+    'offensive_stats': ["xGoal", 'xAssist', "Assists", "Key Passes", "Shots", "Shots on Target", "Shot Accuracy %", 
+                        "Blocked Shots", "Take-Ons Attempted", "Successful Take-On %"],
+    'offensive_emoji': ["⚽", "🔂", "🤝", "🔑", "👟", "🥅", "🎯", "⛔", "⛹️", "✅"],
 
     # ##### Defensive Statistics
-    'defensive_stats': ["Tackles", "Tackles Won %", 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd', "Clearances", "Interceptions", 
-                        "Ball Recoveries", "Blocks", "Errors"],
-    'defensive_emoji': ["🤼", "✅", "🤼", "🤼", "🤼", "🆑", "🥷", "🤒", "🚫️", "⭕"],
+    'defensive_stats': ["Tackles", "Tackles Won %", 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd', 
+                        "Clearances", "Interceptions", "Ball Recoveries", "Blocks", "Errors"],
+    'defensive_emoji': ["🤼", "✅", "⬇️", "↔️", "⬆️", "🆑", "🥷", "🤒", "⛔", "🚫️"],
 
     # ##### Passing Statistics
     'passing_stats': ["Touches", "Passes", "Passes Completion %", "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", 
                       "Passes into Final 3rd", "Passes into Penalty Area", "Crosses", "Crosses into Penalty Area"],
-    'passing_emoji': ["👟", "🔁", "✅", "✅", "✅", "✅", "🥅", "❎", "❎", "❎"],
+    'passing_emoji': ["👟", "🔁", "✅", "⏏️", "⏫", "⏭️", "🥅", "❎", "↪️", "↗️"],
 
     # ##### Goalkeeper Statistics
-    'gk_stats': ["Saves", "Saves %", "Post-Shot xGoal", "Gk Passes", "Goal Kicks", "Gk Throws", "Gk Crosses Faced", "Gk Crosses Stoped", "Gk Crosses Stoped %", 
-                 'Gk Sweeper Actions'],
-    'gk_emoji': ["🧤", "✅", "⚽", "🔁", "👟", "🤾", "❎", "🚫", "🚫", "🚫"]
+    'gk_stats': ["Saves", "Saves %", "Post-Shot xGoal", "Gk Passes", "Goal Kicks", "Gk Throws", "Gk Crosses Faced", 
+                 "Gk Crosses Stoped", "Gk Crosses Stoped %", 'Gk Sweeper Actions'],
+    'gk_emoji': ["🧤", "✅", "⚽", "🔁", "👟", "🤾", "❎", "⛔", "🚫", "🏃‍♂️"]
     }
 config_match_day = config_dict.ConfigDict(match_day_dict)
 

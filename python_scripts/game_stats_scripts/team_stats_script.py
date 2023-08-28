@@ -511,7 +511,7 @@ def team_page(data:pd.DataFrame,
                                                                      team=favourite_team)
         st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Season Filter Stats</h4>', unsafe_allow_html=True)
     
-        insights_col, type_chart_col = st.columns([3, 9])
+        insights_col, type_chart_col = st.columns([2, 8])
         with type_chart_col:
             fig_type_team, period_venue, period_venue_1, period_venue_2, period_insights, \
                 period_insights_1, period_insights_2 = team_season_filter(data_team_agg=season_team_stats, 
@@ -525,20 +525,20 @@ def team_page(data:pd.DataFrame,
             st.title("")
             if period_venue != "":
                 st.markdown(
-                    f"<b><font color = #d20614>{favourite_team}</font></b> performs much better at <b><font color = #d20614>"
-                    f"{period_venue[0]}</font></b> Games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
-                    f"<font color = #43C673>{filter_stat}</font></b> per Game on average in comparison to <b><font color = "
-                    f"#d20614>{period_venue[1]}</font></b> Games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
-                    f"</font></b> <b><font color = #43C673>{filter_stat}</font></b> per Game on average.",
+                    f"<b><font color = #d20614>{favourite_team}</font></b> performs better at <b><font color = #d20614>"
+                    f"{period_venue[0]}</font></b> games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
+                    f"<font color = #43C673>{filter_stat}</font></b> per game on average in comparison to <b><font color = "
+                    f"#d20614>{period_venue[1]}</font></b> games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
+                    f"</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
                     unsafe_allow_html=True)
 
             if period_insights != "":
                 st.markdown(
-                    f"It also performs much better in the <b><font color = #d20614>{period_insights[0]}</font></b> "
-                    f"Season Games with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = #43C673>"
-                    f"{filter_stat}</font></b> per Game on average in comparison to the <b><font color = #d20614>"
-                    f"{period_insights[1]}</font></b> Season Games where they had  <b><font color = #d20614>"
-                    f"{period_insights_2:.2f}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per Game on average.",
+                    f"It also performs better in the <b><font color = #d20614>{period_insights[0]}</font></b> of the "
+                    f"Season with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = #43C673>"
+                    f"{filter_stat}</font></b> per game on average in comparison to the <b><font color = #d20614>"
+                    f"{period_insights[1]}</font></b> of the Season where they had  <b><font color = #d20614>"
+                    f"{period_insights_2:.2f}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
                     unsafe_allow_html=True)
         
         # ##### Show Team or Opponent Stats
