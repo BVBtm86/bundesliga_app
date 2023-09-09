@@ -24,7 +24,6 @@ def main() -> st:
     app_selection = option_menu(menu_title=None,
                                 options=app_main_menu,
                                 icons=["clipboard-data-fill", "fast-forward-circle-fill"],
-                                menu_icon="cast",
                                 orientation="horizontal",
                                 styles={
                                     "container": {"width": "100%!important",
@@ -81,10 +80,10 @@ def main() -> st:
 if __name__ == "__main__":
 
     # ##### Bundesliga App Settings
-    st.set_page_config(layout="wide",
-                    page_title="Bundesliga App",
-                    page_icon=Image.open('images/Bundesliga.png'),
-                    initial_sidebar_state="expanded")
+    st.set_page_config(layout="wide", 
+                       page_title="Bundesliga App", 
+                       page_icon=Image.open('images/Bundesliga.png'), 
+                       initial_sidebar_state="expanded")
     
     # ##### Remove Empty Top Space
     st.markdown('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
@@ -102,7 +101,7 @@ if __name__ == "__main__":
         </style>
         <style>
             section[data-testid="stSidebar"] {
-                width: 300px !important; # Set the width to your desired value
+                width: 300px; # Set the width to your desired value
             }
         </style>
         """,

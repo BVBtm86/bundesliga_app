@@ -74,7 +74,6 @@ config_teams_images = {
          "VfL Wolfsburg": ["https://assets.bundesliga.com/stadium/icon/DFL-STA-000003_B.png?fit=64,64", "Volkswagen Arena"], 
          }}
 
-
 # ##### Season Filter
 season_filter_dict = {
      'season_filter':['Season', 'Form', 'Home', 'Away', '1st Half', '2nd Half', 'Win', 'Draw', 'Defeat']
