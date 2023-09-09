@@ -101,7 +101,7 @@ if __name__ == "__main__":
         </style>
         <style>
             section[data-testid="stSidebar"] {
-                width: 300px; # Set the width to your desired value
+                width: 300px !important; # Set the width to your desired value
             }
         </style>
         """,
