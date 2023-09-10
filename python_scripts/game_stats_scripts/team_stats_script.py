@@ -359,13 +359,13 @@ def comparison_all_stats(data:pd.DataFrame,
     # ##### Insight Significance Level
     insight_df = season_team_data['Sig'].value_counts().reset_index(drop=False)
     insight_data = []
-    try: 
+    if "🟢" in insight_df['Sig'].values:
         insight_data.append(insight_df[insight_df['Sig'] == "🟢"]['count'].values[0]),
-    except:
+    else:
         insight_data.append(0)
-    try: 
+    if "🔴" in insight_df['Sig'].values:
         insight_data.append(insight_df[insight_df['Sig'] == "🔴"]['count'].values[0]),
-    except:
+    else:
         insight_data.append(0)
 
     return season_team_data, insight_data
@@ -545,14 +545,15 @@ def team_last_seasons_stats(data:pd.DataFrame,
     # ##### Insight Significance Level
     insight_df = seasons_team_data['Sig'].value_counts().reset_index(drop=False)
     insight_season_comparison = [current_season, previous_season]
-    try: 
+    if "🟢" in seasons_team_data['Sig'].values:
         insight_season_comparison.append(insight_df[insight_df['Sig'] == "🟢"]['count'].values[0]),
-    except:
+    else:
         insight_season_comparison.append(0)
-    try: 
+    if "🔴" in seasons_team_data['Sig'].values:
         insight_season_comparison.append(insight_df[insight_df['Sig'] == "🔴"]['count'].values[0]),
-    except:
+    else:
         insight_season_comparison.append(0)
+
 
     # Last 5 Season Stats Plot Data
     plot_data = seasons_team_data[seasons_team_data['Statistics'] == stat_filter]
