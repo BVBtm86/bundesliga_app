@@ -718,10 +718,8 @@ def team_page(data:pd.DataFrame,
                     unsafe_allow_html=True)
         
         # ##### Show Team or Opponent Stats
-        col_show_team, _ = st.columns([2,6])
-        with col_show_team:
-            show_team = st.selectbox(label="Show",
-                                    options=[f"{favourite_team} Stats", "Opponents Stats"])
+        show_team = st.sidebar.selectbox(label="Show",
+                                         options=[f"{favourite_team} Stats", "Opponents Stats"])
         
         pos_stat = config_team_stats.stats_team.index(filter_stat)
         if show_team == f"{favourite_team} Stats":
