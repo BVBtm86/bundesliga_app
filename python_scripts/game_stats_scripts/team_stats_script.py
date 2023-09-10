@@ -358,13 +358,14 @@ def comparison_all_stats(data:pd.DataFrame,
 
     # ##### Insight Significance Level
     insight_df = season_team_data['Sig'].value_counts().reset_index(drop=False)
+    insight_df['Sig'] = insight_df['Sig'].map({"🟢":'Up',"🔴":'Down'})
     insight_data = []
-    if "🟢" in insight_df['Sig'].values:
-        insight_data.append(insight_df[insight_df['Sig'] == "🟢"]['count'].values[0]),
+    if "Up" in insight_df['Sig'].values:
+        insight_data.append(insight_df[insight_df['Sig'] == "Up"]['count'].values[0]),
     else:
         insight_data.append(0)
-    if "🔴" in insight_df['Sig'].values:
-        insight_data.append(insight_df[insight_df['Sig'] == "🔴"]['count'].values[0]),
+    if "Down" in insight_df['Sig'].values:
+        insight_data.append(insight_df[insight_df['Sig'] == "Down"]['count'].values[0]),
     else:
         insight_data.append(0)
 
@@ -544,18 +545,18 @@ def team_last_seasons_stats(data:pd.DataFrame,
 
     # ##### Insight Significance Level
     insight_df = seasons_team_data['Sig'].value_counts().reset_index(drop=False)
+    insight_df['Sig'] = insight_df['Sig'].map({"🟢":'Up',"🔴":'Down'})
     insight_season_comparison = [current_season, previous_season]
-    if "🟢" in seasons_team_data['Sig'].values:
-        insight_season_comparison.append(insight_df[insight_df['Sig'] == "🟢"]['count'].values[0]),
+    if "Up" in insight_df['Sig'].values:
+        insight_season_comparison.append(insight_df[insight_df['Sig'] == "Up"]['count'].values[0]),
     else:
         insight_season_comparison.append(0)
-    if "🔴" in seasons_team_data['Sig'].values:
-        insight_season_comparison.append(insight_df[insight_df['Sig'] == "🔴"]['count'].values[0]),
+    if "Down" in insight_df['Sig'].values:
+        insight_season_comparison.append(insight_df[insight_df['Sig'] == "Down"]['count'].values[0]),
     else:
         insight_season_comparison.append(0)
 
-
-    # Last 5 Season Stats Plot Data
+    # ##### Last 5 Season Stats Plot Data
     plot_data = seasons_team_data[seasons_team_data['Statistics'] == stat_filter]
     seasons = list(seasons_team_data.columns[1:-1])
     plot_seasons = pd.pivot_table(plot_data, 
