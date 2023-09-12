@@ -590,7 +590,7 @@ def team_last_seasons_stats(data:pd.DataFrame,
     
     # ##### Insights Previous 5 Seasons
     insights_5_seasons = [plot_seasons.shape[0], 
-                          plot_seasons.sort_values(by='Possession', ascending=False)['Season'].values[0]]
+                          plot_seasons.sort_values(by=stat_filter, ascending=False)['Season'].values[0]]
         
     return seasons_team_data, seasons_fig, insight_season_comparison, insights_5_seasons
 
@@ -611,14 +611,13 @@ def team_page(data:pd.DataFrame,
     # ##### Select Season Filter
     possible_season_filters = data[data['Team'] == favourite_team][config_season_filter.season_filter].sum() > 0
     season_filters = data[data['Team'] == favourite_team][config_season_filter.season_filter].sum()[possible_season_filters].index.to_list().copy()
-    if stats_type == 'Last 5 Seasons':
+    if stats_type == 'Team vs Team':
+        filter_season = st.sidebar.selectbox(label="Season Filter", 
+                                                options=season_filters)
+    elif stats_type == 'Last 5 Seasons':
         season_filters.remove("Form")
         filter_season = st.sidebar.selectbox(label="Season Filter", 
                                                 options=season_filters)
-    else:
-        filter_season = st.sidebar.selectbox(label="Season Filter", 
-                                                options=season_filters)
-
     # ##### Season Team Statistics
     if stats_type == "Season":
 
@@ -874,4 +873,3 @@ def team_page(data:pd.DataFrame,
             st.markdown(f"Season <b><font color = #d20614>{season_comparison_insights[0]}</font></b> has <b><font color = #d20614>{season_comparison_insights[2]}</font></b> <b>Significant Higher</b> "
                 f"game average stats then Season <b><font color = #d20614>{season_comparison_insights[1]}</font></b> for <b><font color = #d20614>{filter_season}</font></b> Games and "
                 f"<b><font color = #d20614>{season_comparison_insights[3]}</font></b> <b>Significant Lower</b> game average stats", unsafe_allow_html=True)
-            
