@@ -1,8 +1,9 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from python_scripts.data_script import retrieve_season_data, retrieve_all_seasons_data
-from python_scripts.game_stats_scripts.day_stats_script import match_day_page
-from python_scripts.game_stats_scripts.table_stats_script import table_page
+from python_scripts.game_stats_scripts.game_results_script import game_results_page
+from python_scripts.game_stats_scripts.standings_stats_script import standings_page
+from python_scripts.game_stats_scripts.game_stats_script import game_stats_page
 from python_scripts.game_stats_scripts.team_stats_script import team_page
 from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
 
@@ -28,8 +29,9 @@ def game_stats_analysis(team:str,
         unsafe_allow_html=True)
 
     # ##### Game Stats Analysis Types
-    statistics_type = ["Match Day Statistics",
-                       "Season Table",
+    statistics_type = ["Match Day Results",
+                       "Season Standings",
+                       "Game Statistics",
                        "Team Statistics",
                        "Player Statistics",
                        "Goalkeeper Statistics"]
@@ -38,19 +40,25 @@ def game_stats_analysis(team:str,
         st.subheader("Statistics")
         statistics_track = option_menu(menu_title=None,
                                        options=statistics_type,
-                                       icons=["calendar3", "table", "reception-4",
-                                              "person-lines-fill", "shield-shaded"],
+                                       icons=["calendar3", "table", "clipboard-data",
+                                              "reception-4", "person-lines-fill", "shield-shaded"],
                                        styles={"nav-link": {"--hover-color": "#e5e5e6"}})
 
-    # # ##### Match Day Statistics
-    if statistics_track == 'Match Day Statistics':
-        match_day_page(data=season_data,
-                       page_season=season,
-                       favourite_team=team)
+    # ##### Match Day Results
+    if statistics_track == 'Match Day Results':
+        game_results_page(data=season_data,
+                          page_season=season, 
+                          favourite_team=team)
 
     # ##### Season Table
-    elif statistics_track == 'Season Table':
-        table_page(data=season_data,
+    elif statistics_track == 'Season Standings':
+        standings_page(data=season_data,
+                   page_season=season,
+                   favourite_team=team)
+    
+    # ##### Game Statistics
+    elif statistics_track == 'Game Statistics':
+        game_stats_page(data=season_data,
                    page_season=season,
                    favourite_team=team)
 

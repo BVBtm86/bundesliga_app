@@ -42,7 +42,7 @@ def match_day_stats(data:pd.DataFrame,
 
 
 # ##### Match Data Page
-def match_day_page(data:pd.DataFrame, 
+def game_stats_page(data:pd.DataFrame, 
                    page_season:str, 
                    favourite_team:str) -> st:
     
@@ -61,7 +61,7 @@ def match_day_page(data:pd.DataFrame,
     # ##### Season Data
     season_buli_df = data.copy()
 
-    # ##### Match Day Page Options
+    # ##### Game Statistics Page Options
     st.sidebar.subheader("Options")
 
     # ##### Venue Options per Favourite Team

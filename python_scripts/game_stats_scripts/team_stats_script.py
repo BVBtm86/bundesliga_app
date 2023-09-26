@@ -601,6 +601,9 @@ def team_page(data:pd.DataFrame,
               season_teams:list) -> st:
     config = {'displayModeBar': False}
 
+    # ##### Team Statistics Page Options
+    st.sidebar.subheader("Options")
+
     # #### Team Statistics Type
     team_stats_options = ["Season", "Team vs Team", "Last 5 Seasons"]
     if config_previous_seasons.season_id.keys()[-1] != page_season:

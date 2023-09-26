@@ -4,9 +4,9 @@ import streamlit as st
 from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, config_season_filter, filter_season_data, process_goals_opponent, buli_table_data
 
 # ##### Bundesliga Table Page
-def table_page(data:pd.DataFrame, 
-               page_season:str, 
-               favourite_team:str) -> st:
+def standings_page(data:pd.DataFrame, 
+                   page_season:str, 
+                   favourite_team:str) -> st:
 
     # ##### Process Goals Against
     data_processed = process_goals_opponent(data=data)
