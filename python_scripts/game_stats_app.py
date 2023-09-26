@@ -1,11 +1,11 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from python_scripts.data_script import retrieve_season_data, retrieve_all_seasons_data
-from python_scripts.game_stats_scripts.game_results_script import game_results_page
-from python_scripts.game_stats_scripts.standings_stats_script import standings_page
-from python_scripts.game_stats_scripts.game_stats_script import game_stats_page
-from python_scripts.game_stats_scripts.team_stats_script import team_page
-from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
+from python_scripts.data_script import retrieve_season_games, retrieve_season_data, retrieve_all_seasons_data
+from python_scripts.game_stats_app_scripts.game_results_script import game_results_page
+from python_scripts.game_stats_app_scripts.standings_stats_script import standings_page
+from python_scripts.game_stats_app_scripts.game_stats_script import game_stats_page
+from python_scripts.game_stats_app_scripts.team_stats_script import team_page
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
 
 def game_stats_analysis(team:str, 
                         season_teams:list,
@@ -77,8 +77,15 @@ def game_stats_analysis(team:str,
         all_seasons_data = filter_season_data(
             data=process_team_data(
             data=all_seasons_team_data, data_gk=all_seasons_gk_data))
+        
+        # ##### Retrieve Season Games
+        season_games_schedule=retrieve_season_games(table=supabase_tab_info.games_tab,
+                                                    season=season)
+
+        # ##### Team Page
         team_page(data=season_data,
                   data_all=all_seasons_data,
+                  games_schedule=season_games_schedule,
                   page_season=season,
                   favourite_team=team,
                   season_teams=season_teams)

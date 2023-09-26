@@ -31,6 +31,17 @@ def retrieve_season_info(table:str) -> tuple[pd.DataFrame,
 
     return game_stats_seasons, game_id_seasons
 
+# ########## Retrieve Season Games
+st.cache_data
+def retrieve_season_games(table:str,
+                          season:str) -> pd.DataFrame:
+    
+    """ Season Games Schedule """
+    data_query = supabase.table(table).select('*').eq('Season', season).execute().data
+    season_games = pd.DataFrame(data_query)
+
+    return season_games
+
 # #################################################################################################### Game Stats Analysis
 # ########## Retrieve Season Teams
 def retrieve_season_teams(table:str, 
@@ -59,7 +70,7 @@ def retrieve_season_data(table:str,
     return season_data
 
 
-# # ########## Retrieve Last 5 Seasons Data
+# ########## Retrieve Last 5 Seasons Data
 st.cache_data
 def retrieve_all_seasons_data(table:str, 
                               team:str, 

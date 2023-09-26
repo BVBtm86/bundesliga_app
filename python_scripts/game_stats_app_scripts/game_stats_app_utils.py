@@ -7,6 +7,7 @@ from ml_collections import config_dict
 # ########## Supabase Tables
 tab_info_dict = {
     'info_tab': "buli_seasons_info",
+    'games_tab': "buli_games_schedule",
     'team_stats_tab': "buli_stats_team",
     'player_stats_tab': "buli_stats_player",
     'gk_stas_tab': "buli_stats_gk"
@@ -267,6 +268,7 @@ def filter_season_data(data:pd.DataFrame) -> pd.DataFrame:
 
     return buli_df
 
+# ##### Create Season Bundesliga Table
 def buli_table_data(data:pd.DataFrame, 
                     table_type:str) -> pd.DataFrame:
     # ##### Season Data
@@ -313,18 +315,19 @@ def style_metric_cards(background_color: str = "#e5e5e6",
             unsafe_allow_html=True,
         )
 
-def radar_mosaic(radar_height=0.500, title_height=0, figheight=2):
-    if title_height + radar_height > 1:
-        error_msg = 'Reduce one of the radar_height or title_height so the total is ≤ 1.'
-        raise ValueError(error_msg)
+# ##### Radar Mosaic
+def radar_mosaic(radar_height:float=0.500, title_height:int=0, figheight:int=2):
     endnote_height = 1 - title_height - radar_height
     figwidth = figheight * radar_height
     figure, axes = plt.subplot_mosaic([['title'], ['radar'], ['endnote']],
-                                      gridspec_kw={'height_ratios': [title_height, radar_height,
-                                                                     endnote_height],
-                                                   'bottom': 0, 'left': 0, 'top': 1,
-                                                   'right': 1, 'hspace': 0},
+                                      gridspec_kw={'height_ratios': [title_height, radar_height, endnote_height],
+                                                   'bottom': 0, 
+                                                   'left': 0, 
+                                                   'top': 1,
+                                                   'right': 1, 
+                                                   'hspace': 0},
                                       figsize=(figwidth, figheight))
     axes['title'].axis('off')
     axes['endnote'].axis('off')
+
     return figure, axes

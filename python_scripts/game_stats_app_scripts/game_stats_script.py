@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, config_match_day_stats
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_teams_images, config_match_day_stats
 
 # ##### Process Match Day Stats Incons
 def stat_name_icon(stats:str) -> list:

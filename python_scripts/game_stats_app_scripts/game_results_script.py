@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_teams_images
 
 
 def game_results_page(data:pd.DataFrame,

@@ -1,19 +1,21 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_scripts.game_stats_utils import config_teams_images, config_season_filter, filter_season_data, process_goals_opponent, buli_table_data
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_teams_images, config_season_filter, filter_season_data, process_goals_opponent, buli_table_data
 
 # ##### Bundesliga Table Page
 def standings_page(data:pd.DataFrame, 
                    page_season:str, 
                    favourite_team:str) -> st:
 
+    # ##### Standings Page Options
+    st.sidebar.subheader("Options")
+
     # ##### Process Goals Against
     data_processed = process_goals_opponent(data=data)
     
     # ##### Process Season Data
     season_df = filter_season_data(data=data_processed)
-
 
     # ##### Check Max Match Day
     match_day = season_df['Week_No'].max()
@@ -28,7 +30,7 @@ def standings_page(data:pd.DataFrame,
     # ##### Season Table
     buli_season_df = buli_table_data(data=season_df, 
                                      table_type=season_type)
-    st.markdown(f'<h4>{page_season}</b> <b><font color = #d20614>{season_type}</font> Table</h4>', unsafe_allow_html=True)
+    st.markdown(f'<h4>{page_season}</b> <b><font color = #d20614>{season_type}</font> Standings</h4>', unsafe_allow_html=True)
 
     # ##### Season Rank
     buli_season_df = buli_season_df.reset_index(drop=False)

@@ -2,7 +2,7 @@ import streamlit as st
 from supabase import create_client
 from PIL import Image
 from streamlit_option_menu import option_menu
-from python_scripts.game_stats_scripts.game_stats_utils import supabase_tab_info
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import supabase_tab_info
 from python_scripts.data_script import retrieve_season_info, retrieve_season_teams
 from python_scripts.game_stats_app import game_stats_analysis
 

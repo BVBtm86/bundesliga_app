@@ -6,7 +6,7 @@ import plotly.express as px
 from scipy.stats import ttest_ind
 from mplsoccer import Radar, grid, Bumpy
 from highlight_text import fig_text
-from python_scripts.game_stats_scripts.game_stats_utils import config_team_stats, config_teams_images, config_previous_seasons, config_season_filter, config_importance_stats, config_comparison_stats, buli_table_data, style_metric_cards
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_team_stats, config_teams_images, config_previous_seasons, config_season_filter, config_importance_stats, config_comparison_stats, buli_table_data, style_metric_cards
 import warnings
 
 #suppress warnings
@@ -596,6 +596,7 @@ def team_last_seasons_stats(data:pd.DataFrame,
 
 def team_page(data:pd.DataFrame, 
               data_all:pd.DataFrame, 
+              games_schedule:pd.DataFrame,
               page_season:str, 
               favourite_team:str,
               season_teams:list) -> st:
@@ -746,11 +747,26 @@ def team_page(data:pd.DataFrame,
     # ##### Season Team vs Team Statistics
     elif stats_type == "Team vs Team":
         
+        # ##### Get Current Match Day Week
+        current_match_day = data['Week_No'].max()
+        if current_match_day < 34:
+            next_game = current_match_day + 1
+        else:
+            next_game = 34
+
+        # ##### Extract Next Opponent
+        week_games_schedule = games_schedule[games_schedule['Week No'] == next_game]
+        if favourite_team in week_games_schedule['Home Team'].to_list():
+            next_opponent = week_games_schedule[week_games_schedule['Home Team'] == favourite_team]['Away Team'].values[0]
+        else:
+            next_opponent = week_games_schedule[week_games_schedule['Away Team'] == favourite_team]['Home Team'].values[0]
+
         # ##### Select Opponent
         opponent_teams = season_teams.copy()
         opponent_teams.remove(favourite_team)
         opponent_team = st.sidebar.selectbox(label="Select Opponent", 
-                                             options=opponent_teams)
+                                             options=opponent_teams,
+                                             index=opponent_teams.index(next_opponent))
         
         # ##### Select Statistics
         filter_stats = st.sidebar.selectbox(label="Select Statistics", 
