@@ -654,10 +654,11 @@ def team_page(data:pd.DataFrame,
         if diff_important_stats[0] != "":
             st.markdown(
                 f"<b>Note:</b> <b><font color = #43C673>{page_season}</font></b> vs <b><font color = #d20614> "
-                f"{config_previous_seasons.season_comparison[page_season]}</font></b> Season comparison", unsafe_allow_html=True)
+                f"{config_previous_seasons.season_comparison[page_season]}</font></b> Season comparison after "
+                f"<b>Match Day <font color = #d20614>{data['Week_No'].max()}</font></b> ", unsafe_allow_html=True)
 
         # ##### Team Match Day Stats
-        st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Match Day Stats</h4>', unsafe_allow_html=True)
+        st.markdown(f'<h4>{favourite_team} <font color = #d20614>{page_season}</font> Match Day Stats</h4>', unsafe_allow_html=True)
 
         match_day_fig, avg_team, avg_opp, better, stat_sig_name = teams_day_analysis(data=data, 
                                                                                      team=favourite_team, 
@@ -688,7 +689,7 @@ def team_page(data:pd.DataFrame,
         # ##### Team Season Filter Statistics
         season_team_stats, season_opponent_stats = team_season_stats(data=data,
                                                                      team=favourite_team)
-        st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>{page_season}</font> Season Filter Stats</h4>', unsafe_allow_html=True)
+        st.markdown(f'<h4>{favourite_team} <font color = #d20614>{page_season}</font> Season Filter Stats</h4>', unsafe_allow_html=True)
     
         insights_col, type_chart_col = st.columns([2, 8])
         with type_chart_col:
@@ -700,25 +701,25 @@ def team_page(data:pd.DataFrame,
             if match_day_fig is not None:
                 st.plotly_chart(fig_type_team, config=config, use_container_width=True)
 
-        with insights_col:
-            st.title("")
-            if period_venue != "":
-                st.markdown(
-                    f"<b><font color = #d20614>{favourite_team}</font></b> performs better at <b><font color = #d20614>"
-                    f"{period_venue[0]}</font></b> games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
-                    f"<font color = #43C673>{filter_stat}</font></b> per game on average in comparison to <b><font color = "
-                    f"#d20614>{period_venue[1]}</font></b> games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
-                    f"</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
-                    unsafe_allow_html=True)
+                with insights_col:
+                    st.title("")
+                    if period_venue != "":
+                        st.markdown(
+                            f"<b><font color = #d20614>{favourite_team}</font></b> performs better at <b><font color = #d20614>"
+                            f"{period_venue[0]}</font></b> games with <b><font color = #d20614>{period_venue_1:.2f}</font></b> <b>"
+                            f"<font color = #43C673>{filter_stat}</font></b> per game on average in comparison to <b><font color = "
+                            f"#d20614>{period_venue[1]}</font></b> games where they had  <b><font color = #d20614>{period_venue_2:.2f}"
+                            f"</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
+                            unsafe_allow_html=True)
 
-            if period_insights != "":
-                st.markdown(
-                    f"It also performs better in the <b><font color = #d20614>{period_insights[0]}</font></b> of the "
-                    f"Season with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = #43C673>"
-                    f"{filter_stat}</font></b> per game on average in comparison to the <b><font color = #d20614>"
-                    f"{period_insights[1]}</font></b> of the Season where they had  <b><font color = #d20614>"
-                    f"{period_insights_2:.2f}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
-                    unsafe_allow_html=True)
+                    if period_insights != "":
+                        st.markdown(
+                            f"It also performs better in the <b><font color = #d20614>{period_insights[0]}</font></b> of the "
+                            f"Season with <b><font color = #d20614>{period_insights_1:.2f}</font></b> <b><font color = #43C673>"
+                            f"{filter_stat}</font></b> per game on average in comparison to the <b><font color = #d20614>"
+                            f"{period_insights[1]}</font></b> of the Season where they had  <b><font color = #d20614>"
+                            f"{period_insights_2:.2f}</font></b> <b><font color = #43C673>{filter_stat}</font></b> per game on average.",
+                            unsafe_allow_html=True)
         
         # ##### Show Team or Opponent Stats
         show_team = st.sidebar.selectbox(label="Show",
@@ -726,23 +727,18 @@ def team_page(data:pd.DataFrame,
         
         pos_stat = config_team_stats.stats_team.index(filter_stat)
         if show_team == f"{favourite_team} Stats":
-            st.dataframe(season_team_stats.style.format({stat: '{:.2f}' for stat in config_season_filter.season_filter}).apply(lambda x: [
-                'background-color: #ffffff' if i % 2 == 0 else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
-                lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
-                            use_container_width=True, 
-                            hide_index=True,
-                            column_config={
-                            "Stat": st.column_config.Column(
-                                width="medium")})
+            season_filter_data = season_team_stats.copy()
         else:
-            st.dataframe(data=season_opponent_stats.style.format({stat: '{:.2f}' for stat in config_season_filter.season_filter}).apply(lambda x: [
-                'background-color: #ffffff' if i % 2 == 0 else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
-                lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
-                            use_container_width=True, 
-                            hide_index=True,
-                            column_config={
-                            "Stat": st.column_config.Column(
-                                width="medium")})
+            season_filter_data = season_opponent_stats.copy()
+        
+        st.dataframe(season_filter_data.style.format({stat: '{:.2f}' for stat in config_season_filter.season_filter}).apply(lambda x: [
+            'background-color: #ffffff' if i % 2 == 0 else 'background-color: #e5e5e6' for i in range(len(x))], axis=0).apply(
+            lambda x: ['color: #d20614' if i == pos_stat else 'color: #000000' for i in range(len(x))], axis=0), 
+                        use_container_width=True, 
+                        hide_index=True,
+                        column_config={
+                        "Stat": st.column_config.Column(
+                            width="medium")})
             
     # ##### Season Team vs Team Statistics
     elif stats_type == "Team vs Team":

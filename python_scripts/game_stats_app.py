@@ -5,6 +5,7 @@ from python_scripts.game_stats_app_scripts.game_results_script import game_resul
 from python_scripts.game_stats_app_scripts.standings_stats_script import standings_page
 from python_scripts.game_stats_app_scripts.game_stats_script import game_stats_page
 from python_scripts.game_stats_app_scripts.team_stats_script import team_page
+from python_scripts.game_stats_app_scripts.player_stats_script import player_page
 from python_scripts.game_stats_app_scripts.game_stats_app_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
 
 def game_stats_analysis(team:str, 
@@ -91,16 +92,16 @@ def game_stats_analysis(team:str,
                   season_teams=season_teams)
     
     # # ##### Player Statistics
-    # elif statistics_track == 'Player Statistics':
-    #     pass
-    #     # season_player_data = retrieve_season_data(table=player_stats_tab,
-    #     #                                           season=season)
-    #     # all_seasons_player_data = retrieve_all_seasons_data(table=player_stats_tab,
-    #     #                                                     team=team,
-    #     #                                                     seasons=last_5_seasons)
-    #     # player_page(page_season=season,
-    #     #             favourite_team=team,
-    #     #             all_seasons=app_seasons)
+    elif statistics_track == 'Player Statistics':
+        season_player_data = filter_season_data(data=retrieve_season_data(table=supabase_tab_info.player_stats_tab,
+                                                                          season=season))
+        # all_seasons_player_data = retrieve_all_seasons_data(table=supabase_tab_info.player_stats_tab,
+        #                                                     team=team,
+        #                                                     seasons=last_5_seasons)
+  
+        player_page(data=season_player_data,
+                    favourite_team=team,
+                    page_season=season)
     
     # # ##### Goalkeeper Statistics
     # elif statistics_track == 'Goalkeeper Statistics':

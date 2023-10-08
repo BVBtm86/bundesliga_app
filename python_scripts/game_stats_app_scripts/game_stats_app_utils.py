@@ -124,7 +124,7 @@ importance_stats_dict = {
      }
 config_importance_stats = config_dict.ConfigDict(importance_stats_dict)
 
-# ##### Stats
+# ##### Team Stats
 team_stats_dict = {
      # #### Main Stats
      'stats_team': ['Possession', 'Distance Covered (Km)', 'Sprints', 'Goals', 'Assists', 'Shots', 'Shots on Target', 'Shot Accuracy %', 'xGoal', 'xAssist', 
@@ -163,9 +163,52 @@ team_stats_dict = {
                                 'Passes Medium Completed %':['Passes Medium', 'Passes Medium Completed'], 
                                 'Passes Long Completed %':['Passes Long', 'Passes Long Completed'], 'Tackles Won %':['Tackles', 'Tackles Won'], 
                                 'Successful Take-On %':['Take-Ons Attempted', 'Successful Take-Ons'], 
-                                '% of Dribblers Tackled':['Dribblers Tackled', 'Dribbles Challenged'], '% of Aerial Duel Won':['Aerial Duel', 'Aerial Duel Won']}
+                                '% of Dribblers Tackled':['Dribbles Challenged', 'Dribblers Tackled'], '% of Aerial Duel Won':['Aerial Duel', 'Aerial Duel Won']}
                                 }
 config_team_stats = config_dict.ConfigDict(team_stats_dict)
+
+# ##### Player Stats
+player_stats_dict = {
+     # #### Main Stats
+     'stats_player': ['Goals', 'Assists', 'Shots', 'Shots on Target', 'Shot Accuracy %', 'xGoal', 'xAssist', 
+                    'Non-Penalty xG', 'xGoal Assist', 'Shot Creating Actions', 'Goal Creating Actions', 'Key Passes', 'Passes', 'Passes Completed', 
+                    'Passes Completion %', 'Passes Short', 'Passes Short Completed', 'Passes Short Completed %', 'Passes Medium', 'Passes Medium Completed', 
+                    'Passes Medium Completed %', 'Passes Long', 'Passes Long Completed', 'Passes Long Completed %', 'Passes into Final 3rd', 'Passes into Penalty Area', 
+                    'Passing Distance', 'Progressive Passes', 'Progressive Passing Distance', 'Live Ball Passes', 'Dead Ball Passes', 'Passes from Free Kicks', 
+                    'Through Balls', 'Switches', 'Passes Blocked', 'Crosses', 'Crosses into Penalty Area', 'Throw Ins', 'Corner Kicks', 'Inswinging Corner Kicks', 
+                    'Outswinging Corner Kicks', 'Straight Corner Kicks', 'Touches', 'Touches Defensive Penalty Area', 'Touches Defensive 3rd', 'Touches Middle 3rd', 
+                    'Touches Attacking 3rd', 'Touches Attacking Penalty Area', 'Touches Live Ball', 'Take-Ons Attempted', 'Successful Take-Ons', 'Successful Take-On %', 
+                    'Tackled During Take-On', 'Tackled During Take-On %', 'Carries', 'Carrying Distance', 'Progressive Carries', 'Progressive Carrying Distance', 
+                    'Carries into Final 3rd', 'Carries into Penalty Area', 'Miscontrols', 'Dispossessed', 'Passes Received', 'Progressive Passes Received', 'Tackles', 
+                    'Tackles Won', 'Tackles Won %', 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd', 'Dribblers Tackled', 'Dribbles Challenged', 
+                    '% of Dribblers Tackled', 'Challenges Lost', 'Blocks', 'Blocked Shots', 'Blocked Passes', 'Interceptions', 'Ball Recoveries', 'Clearances', 
+                    'Errors', 'Aerial Duel Won', 'Aerial Duel Lost', '% of Aerial Duel Won', 'Yellow Cards', 'Red Cards', 'Second Yellow Card', 'Fouls Committed', 
+                    'Fouls Drawn', 'Offsides', 'Penalty Kicks Made', 'Penalty Kicks Attempted', 'Penalty Kicks Conceded', 'Own Goals'],
+
+    # ##### Aggregate Stats for Count Calculation
+    'stats_count_calculations': ['Goals', 'Assists', 'Shots', 'Shots on Target', 'xGoal', 'xAssist', 'Non-Penalty xG', 
+                                'xGoal Assist', 'Shot Creating Actions', 'Goal Creating Actions', 'Key Passes', 'Passes', 'Passes Completed', 'Passes Short', 
+                                'Passes Short Completed', 'Passes Short Completed %', 'Passes Medium', 'Passes Medium Completed', 'Passes Long', 'Passes Long Completed', 
+                                'Passes into Final 3rd', 'Passes into Penalty Area', 'Passing Distance', 'Progressive Passes', 'Progressive Passing Distance', 
+                                'Live Ball Passes', 'Dead Ball Passes', 'Passes from Free Kicks', 'Through Balls', 'Switches', 'Passes Blocked', 'Crosses', 
+                                'Crosses into Penalty Area', 'Throw Ins', 'Corner Kicks', 'Inswinging Corner Kicks', 'Outswinging Corner Kicks', 'Straight Corner Kicks', 
+                                'Touches', 'Touches Defensive Penalty Area', 'Touches Defensive 3rd', 'Touches Middle 3rd', 'Touches Attacking 3rd', 
+                                'Touches Attacking Penalty Area', 'Touches Live Ball', 'Take-Ons Attempted', 'Successful Take-Ons', 'Tackled During Take-On', 
+                                'Tackled During Take-On %', 'Carries', 'Carrying Distance', 'Progressive Carries', 'Progressive Carrying Distance', 
+                                'Carries into Final 3rd', 'Carries into Penalty Area', 'Miscontrols', 'Dispossessed', 'Passes Received', 'Progressive Passes Received', 
+                                'Tackles', 'Tackles Won', 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd', 'Dribblers Tackled', 
+                                'Dribbles Challenged', 'Challenges Lost', 'Blocks', 'Blocked Shots', 'Blocked Passes', 'Interceptions', 'Ball Recoveries', 'Clearances', 
+                                'Errors', 'Aerial Duel Won', 'Aerial Duel Lost', 'Yellow Cards', 'Red Cards', 'Second Yellow Card', 'Fouls Committed', 'Fouls Drawn', 
+                                'Offsides', 'Penalty Kicks Made', 'Penalty Kicks Attempted', 'Penalty Kicks Conceded', 'Own Goals'],
+
+    # ##### Aggregate Stats for Percentage Calculation
+    'stats_perc_calculations': {'Shot Accuracy %':['Shots', 'Shots on Target'], 'Passes Completion %':['Passes', 'Passes Completed'], 
+                                'Passes Medium Completed %':['Passes Medium', 'Passes Medium Completed'], 
+                                'Passes Long Completed %':['Passes Long', 'Passes Long Completed'], 'Tackles Won %':['Tackles', 'Tackles Won'], 
+                                'Successful Take-On %':['Take-Ons Attempted', 'Successful Take-Ons'], 
+                                '% of Dribblers Tackled':['Dribbles Challenged', 'Dribblers Tackled'], '% of Aerial Duel Won':['Aerial Duel', 'Aerial Duel Won']}
+                                }
+config_player_stats = config_dict.ConfigDict(player_stats_dict)
 
 # ##### Previous Season for Each Current Season
 previous_seasons_dict = {
