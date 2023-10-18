@@ -101,7 +101,8 @@ def game_stats_analysis(team:str,
   
         player_page(data=season_player_data,
                     favourite_team=team,
-                    page_season=season)
+                    page_season=season,
+                    season_teams=season_teams)
     
     # # ##### Goalkeeper Statistics
     # elif statistics_track == 'Goalkeeper Statistics':

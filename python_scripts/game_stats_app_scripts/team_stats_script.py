@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.express as px
 from scipy.stats import ttest_ind
-from mplsoccer import Radar, grid, Bumpy
 from highlight_text import fig_text
-from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_team_stats, config_teams_images, config_previous_seasons, config_season_filter, config_importance_stats, config_comparison_stats, buli_table_data, style_metric_cards
+from mplsoccer import Bumpy
+from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_team_stats, config_teams_images, config_previous_seasons, config_season_filter, config_importance_stats, config_comparison_stats, buli_table_data, style_metric_cards, radar_plot
 import warnings
 
 #suppress warnings
@@ -289,40 +289,10 @@ def last_games_results(data:pd.DataFrame,
     
     return last_5_games_df
 
-def radar_plot(stats:list,
-               comparison_stats:list,
-               min_stats:list,
-               max_stats:list) -> plt:
-    
-    # ##### Default Radar
-    radar = Radar(comparison_stats, 
-                  min_stats, 
-                  max_stats,
-              round_int=[False]*len(comparison_stats),
-              num_rings=7,
-              ring_width=1, center_circle_radius=1)
-
-    # ##### Create Radar Plot
-    radar_fig, axs = grid(figheight=15, grid_height=0.5, title_height=0.01, endnote_height=0.01,
-                    title_space=0, endnote_space=0, grid_key='radar', axis=False)
-
-    radar.setup_axis(ax=axs['radar'], facecolor='None')
-    rings_inner = radar.draw_circles(ax=axs['radar'], facecolor='#e5e5e6', edgecolor='#ffffff')
-    radar_output = radar.draw_radar(stats, ax=axs['radar'],
-                                    kwargs_radar={'facecolor': '#d20614', 'alpha': 0.25},
-                                    kwargs_rings={'facecolor': '#ffffff', 'alpha': 0.25})
-
-    radar_poly, rings_outer, vertices = radar_output
-    range_labels = radar.draw_range_labels(ax=axs['radar'], fontsize=10, color='#000000', font="Sans serif")
-    param_labels = radar.draw_param_labels(ax=axs['radar'], fontsize=12.5, color='#000000', font="Sans serif")
-    axs['radar'].scatter(vertices[:, 0], vertices[:, 1],  c='#d20614', edgecolors='#000000', marker='o', s=100)
-
-    return radar_fig
-
 def comparison_all_stats(data:pd.DataFrame,
                          team:str,
                          opponent:str,
-                         filter_season:str) -> pd.DataFrame:
+                         filter_season:str) -> tuple[pd.DataFrame, list]:
 
     season_data = data.copy()
     team_season_data = season_data[(season_data['Team'].isin([team, opponent])) & (season_data[filter_season] == 1)].copy()
@@ -375,13 +345,16 @@ def team_stats_comparison(data:pd.DataFrame,
                           team:str,
                           opponent:str,
                           filter_stats:str,
-                          filter_season:str):
+                          filter_season:str) -> tuple[radar_plot, 
+                                                      radar_plot, 
+                                                      pd.DataFrame, 
+                                                      list]:
     
     season_data = data.copy()
     season_data['Aerial Duel'] = season_data['Aerial Duel Won'] + season_data['Aerial Duel Lost']
 
     # ##### Stats Filter
-    comparison_stats = config_comparison_stats.stats_list[filter_stats]
+    comparison_stats = config_comparison_stats.team_stats_list[filter_stats]
 
     # ##### Team Statistics
     team_data = season_data[(season_data['Team'] == team) & (season_data[filter_season] == 1)].reset_index()
@@ -609,7 +582,7 @@ def team_page(data:pd.DataFrame,
     team_stats_options = ["Season", "Team vs Team", "Last 5 Seasons"]
     if config_previous_seasons.season_id.keys()[-1] != page_season:
         team_stats_options.remove("Last 5 Seasons")
-    stats_type = st.sidebar.selectbox(label="Season Stats", 
+    stats_type = st.sidebar.selectbox(label="Stats", 
                                       options=team_stats_options)
 
     # ##### Select Season Filter
@@ -760,13 +733,13 @@ def team_page(data:pd.DataFrame,
         # ##### Select Opponent
         opponent_teams = season_teams.copy()
         opponent_teams.remove(favourite_team)
-        opponent_team = st.sidebar.selectbox(label="Select Opponent", 
+        opponent_team = st.sidebar.selectbox(label="Opponent", 
                                              options=opponent_teams,
                                              index=opponent_teams.index(next_opponent))
         
         # ##### Select Statistics
-        filter_stats = st.sidebar.selectbox(label="Select Statistics", 
-                                           options=config_comparison_stats.stats_name)
+        filter_stats = st.sidebar.selectbox(label="Statistics", 
+                                           options=config_comparison_stats.team_stats_name)
         
         # ##### Latest Games Results
         latest_results = last_games_results(data=data_all,
@@ -850,7 +823,7 @@ def team_page(data:pd.DataFrame,
         st.markdown(f'<h4>{favourite_team}</b> <b><font color = #d20614>Last 5</font> Season Stats</h4>', unsafe_allow_html=True)
 
         # ##### Team Stat
-        filter_stat = st.sidebar.selectbox(label="Select Stat", 
+        filter_stat = st.sidebar.selectbox(label="Game Stat", 
                                             options=config_team_stats.stats_team)
         
         last_seasons_stats, last_seasons_plot, season_comparison_insights, insights_last_seasons = team_last_seasons_stats(data=data_all, 

@@ -16,7 +16,7 @@ def game_results_page(data:pd.DataFrame,
 
     # ##### Show Match Day
     available_match_days = np.linspace(1, season_df['Week_No'].max(), season_df['Week_No'].max(), dtype=np.int32)
-    match_day = st.sidebar.selectbox(label="Select Match Day",
+    match_day = st.sidebar.selectbox(label="Match Day",
                                      options=available_match_days,
                                      index=len(available_match_days) - 1)
     

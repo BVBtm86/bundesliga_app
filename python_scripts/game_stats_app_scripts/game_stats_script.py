@@ -71,7 +71,7 @@ def game_stats_page(data:pd.DataFrame,
     venue_options.extend(all_venue_options)
 
     # ##### Select Match Day Venue
-    venue_filter = st.sidebar.selectbox(label="Select Venue",
+    venue_filter = st.sidebar.selectbox(label="Venue",
                                         options=venue_options)
     st.markdown(f'<b>Match Day Statistics</b> <b><font color = #d20614>{page_season}</font></b>',
                 unsafe_allow_html=True)
@@ -83,7 +83,7 @@ def game_stats_page(data:pd.DataFrame,
     else:
         opponent_teams = list(
             season_buli_df[(season_buli_df['Team'] == favourite_team) & (season_buli_df['Venue'] == "Away")]['Opponent'].values)
-    opponent_team = st.sidebar.selectbox(f"Select Opponent",
+    opponent_team = st.sidebar.selectbox(f"Opponent",
                                          options=opponent_teams,
                                          index=len(opponent_teams) - 1)
 

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 from ml_collections import config_dict
+from mplsoccer import Radar, grid
 
 # ########## Supabase Tables
 tab_info_dict = {
@@ -228,17 +229,28 @@ config_previous_seasons = config_dict.ConfigDict(previous_seasons_dict)
 
 # ##### Comparison Statistics
 comparison_stats_dict = {
-     # #### Main Stats
-     'stats_name': ["General", "Offensive", "Defensive", "Passing"],
-     'stats_list': {"General": ["Distance Covered (Km)", "Sprints", "Possession", "% of Aerial Duel Won", "Offsides", 
+     # #### Team Comparison Stats
+     'team_stats_name': ["General", "Offensive", "Defensive", "Passing"],
+     'team_stats_list': {
+                    "General": ["Distance Covered (Km)", "Sprints", "Possession", "% of Aerial Duel Won", "Offsides", 
                                 "Corner Kicks", "Fouls Committed", "Fouls Drawn", "Yellow Cards", "Red Cards"],
                     "Offensive": ["xGoal", 'xAssist', "Assists", "Key Passes", "Shots", "Shots on Target", "Shot Accuracy %", 
                                   "Blocked Shots", "Take-Ons Attempted", "Successful Take-On %"],
                     "Defensive": ["Tackles", "Tackles Won %", 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd',
                                   "Clearances", "Interceptions", "Ball Recoveries", "Blocks", "Errors"],
                     "Passing": ["Touches", "Passes", "Passes Completion %", "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", 
-                                "Passes into Final 3rd", "Passes into Penalty Area", "Crosses", "Crosses into Penalty Area"]}
-                                }   
+                                "Passes into Final 3rd", "Passes into Penalty Area", "Crosses", "Crosses into Penalty Area"]},
+     # #### Player Comparison Stats
+     'player_stats_name': ["Offensive", "Defensive", "Passing"],
+     'player_stats_list': {
+                    "Offensive": ["xGoal", 'xAssist', "Assists", "Key Passes", "Shots", "Shots on Target", "Shot Accuracy %", 
+                                  "Blocked Shots", "Take-Ons Attempted", "Successful Take-On %", "% of Aerial Duel Won", "Offsides"],
+                    "Defensive": ["Tackles", "Tackles Won %", 'Tackles Defensive 3rd', 'Tackles Middle 3rd', 'Tackles Attacking 3rd',
+                                  "Clearances", "Interceptions", "Ball Recoveries", "Blocks", "Errors", "Fouls Committed", "Fouls Drawn", 
+                                  "Yellow Cards"],
+                    "Passing": ["Touches", "Passes", "Passes Completion %", "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", 
+                                "Passes into Final 3rd", "Passes into Penalty Area", "Corner Kicks", "Crosses", "Crosses into Penalty Area"]},
+                                }
 config_comparison_stats = config_dict.ConfigDict(comparison_stats_dict)
 
 # ##### Process Bundesliga Team and Gk Data
@@ -374,3 +386,39 @@ def radar_mosaic(radar_height:float=0.500, title_height:int=0, figheight:int=2):
     axes['endnote'].axis('off')
 
     return figure, axes
+
+# ##### Radar Plot
+def radar_plot(stats:list,
+               comparison_stats:list,
+               min_stats:list,
+               max_stats:list,
+               radar_name:bool=False,
+               player_name:str='') -> plt:
+    
+    # ##### Default Radar
+    radar = Radar(comparison_stats, 
+                  min_stats, 
+                  max_stats,
+              round_int=[False]*len(comparison_stats),
+              num_rings=7,
+              ring_width=1, center_circle_radius=1)
+
+    # ##### Create Radar Plot
+    radar_fig, axs = grid(figheight=15, grid_height=0.5, title_height=0.01, endnote_height=0.01,
+                    title_space=0, endnote_space=0, grid_key='radar', axis=False)
+
+    radar.setup_axis(ax=axs['radar'], facecolor='None')
+    radar.draw_circles(ax=axs['radar'], facecolor='#e5e5e6', edgecolor='#ffffff')
+    radar_output = radar.draw_radar(stats, ax=axs['radar'],
+                                    kwargs_radar={'facecolor': '#d20614', 'alpha': 0.25},
+                                    kwargs_rings={'facecolor': '#ffffff', 'alpha': 0.25})
+
+    _, _, vertices = radar_output
+    radar.draw_range_labels(ax=axs['radar'], fontsize=10, color='#000000', font="Sans serif")
+    radar.draw_param_labels(ax=axs['radar'], fontsize=12.5, color='#000000', font="Sans serif")
+    axs['radar'].scatter(vertices[:, 0], vertices[:, 1],  c='#d20614', edgecolors='#000000', marker='o', s=100)
+
+    if radar_name:
+         axs['title'].text(0.5, 1, player_name, fontsize=15, color='#d20614', ha='center', va='center')
+    
+    return radar_fig

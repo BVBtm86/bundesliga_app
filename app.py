@@ -32,14 +32,14 @@ def main() -> st:
                                 })
 
     # ##### Select Season
-    season_selected = st.sidebar.selectbox(label="Select Season",
+    season_selected = st.sidebar.selectbox(label="Season",
                                             options=last_5_seasons,
                                             index=4)
 
     # ##### Select Favourite Team
     available_teams, pos_index = retrieve_season_teams(table=supabase_tab_info.info_tab,
                                                        season=season_selected)
-    favourite_team = st.sidebar.selectbox(label="Select Team", 
+    favourite_team = st.sidebar.selectbox(label="Team", 
                                           options=available_teams, 
                                           index=pos_index)
 
