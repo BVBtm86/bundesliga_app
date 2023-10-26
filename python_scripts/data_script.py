@@ -92,4 +92,15 @@ def retrieve_all_seasons_data(table:str,
 
     return all_seasons_data
 
+st.cache_data
+def retrieve_all_seasons_player_data(table:str,
+                                     player_name:str,
+                                     seasons:str) -> pd.DataFrame:
+    """ Retrieve All Players Season Data """
+    data_query = supabase.table(table).select('*').eq('Name', player_name).execute().data
+    all_seasons_player_data = pd.DataFrame(data_query)
+    all_seasons_player_data = all_seasons_player_data[all_seasons_player_data['Season'].isin(seasons)].reset_index(drop=True)
+
+    return all_seasons_player_data
+
 # #################################################################################################### Game Events Analysis

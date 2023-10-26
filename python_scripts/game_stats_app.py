@@ -53,15 +53,15 @@ def game_stats_analysis(team:str,
 
     # ##### Season Table
     elif statistics_track == 'Season Standings':
-        standings_page(data=season_data,
-                   page_season=season,
-                   favourite_team=team)
+        standings_page(data=season_data, 
+                       page_season=season,
+                       favourite_team=team)
     
     # ##### Game Statistics
     elif statistics_track == 'Game Statistics':
         game_stats_page(data=season_data,
-                   page_season=season,
-                   favourite_team=team)
+                        page_season=season,
+                        favourite_team=team)
 
     # ##### Team Statistics
     elif statistics_track == 'Team Statistics':
@@ -95,14 +95,12 @@ def game_stats_analysis(team:str,
     elif statistics_track == 'Player Statistics':
         season_player_data = filter_season_data(data=retrieve_season_data(table=supabase_tab_info.player_stats_tab,
                                                                           season=season))
-        # all_seasons_player_data = retrieve_all_seasons_data(table=supabase_tab_info.player_stats_tab,
-        #                                                     team=team,
-        #                                                     seasons=last_5_seasons)
   
         player_page(data=season_player_data,
                     favourite_team=team,
                     page_season=season,
-                    season_teams=season_teams)
+                    season_teams=season_teams,
+                    last_5_seasons=last_5_seasons)
     
     # # ##### Goalkeeper Statistics
     # elif statistics_track == 'Goalkeeper Statistics':
