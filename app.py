@@ -16,7 +16,7 @@ def main() -> st:
     last_5_seasons, last_5_seasons_id = retrieve_season_info(table=supabase_tab_info.info_tab)
 
     # ##### Set Application Name and Options
-    st.markdown(f"<h1><font color = #d20614>Bundesliga</font> Application</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1><font color = #d20614>Bundesliga</font> Stats</h1>", unsafe_allow_html=True)
     st.markdown("")
 
     # ##### Select App Analysis 
