@@ -11,7 +11,7 @@ tab_info_dict = {
     'games_tab': "buli_games_schedule",
     'team_stats_tab': "buli_stats_team",
     'player_stats_tab': "buli_stats_player",
-    'gk_stas_tab': "buli_stats_gk"
+    'gk_stats_tab': "buli_stats_gk"
     }
 supabase_tab_info = config_dict.ConfigDict(tab_info_dict)
 
@@ -211,6 +211,25 @@ player_stats_dict = {
                                 }
 config_player_stats = config_dict.ConfigDict(player_stats_dict)
 
+# ##### Gk Stats
+gk_stats_dict = {
+     # #### Main Stats
+     'stats_gk': ["Saves", "Saves %", "Gk Shots on Target Against", "Gk Goals Against", "Post-Shot xGoal", "Launched Passes", "Launched Passes Completed", 
+                  "Launched Passes Completed %", "Gk Passes", "Gk Throws", "Gk Average Pass Length", "Goal Kicks", "Goal Kicks Launch %", 
+                  "Goal Kicks Average Length", "Gk Crosses Faced", "Gk Crosses Stoped", "Gk Crosses Stoped %", "Gk Sweeper Actions", 
+                  "Gk Sweeper Average Distance"],
+
+    # ##### Aggregate Stats for Count Calculation
+    'stats_count_calculations': ["Saves", "Gk Shots on Target Against", "Gk Goals Against", "Post-Shot xGoal", "Launched Passes", "Launched Passes Completed", 
+                  "Gk Passes", "Gk Throws", "Gk Average Pass Length", "Goal Kicks", "Goal Kicks Launch %", "Goal Kicks Average Length", "Gk Crosses Faced", 
+                  "Gk Crosses Stoped", "Gk Sweeper Actions", "Gk Sweeper Average Distance"],
+
+    # ##### Aggregate Stats for Percentage Calculation
+    'stats_perc_calculations': {"Saves %":["Gk Shots on Target Against", "Saves"], "Launched Passes Completed %":["Launched Passes", "Launched Passes Completed"], 
+                                "Gk Crosses Stoped %":["Gk Crosses Faced", "Gk Crosses Stoped"]}}
+config_gk_stats = config_dict.ConfigDict(gk_stats_dict)
+
+
 # ##### Previous Season for Each Current Season
 previous_seasons_dict = {
      'season_comparison': {'2018-2019':'2017-2018',
@@ -250,7 +269,8 @@ comparison_stats_dict = {
                                   "Yellow Cards"],
                     "Passing": ["Touches", "Passes", "Passes Completion %", "Passes Short Completed %", "Passes Medium Completed %", "Passes Long Completed %", 
                                 "Passes into Final 3rd", "Passes into Penalty Area", "Corner Kicks", "Crosses", "Crosses into Penalty Area"]},
-                                }
+        'gk_stats':["Saves", "Saves %", "Post-Shot xGoal", "Gk Passes", "Goal Kicks", "Gk Throws", "Gk Crosses Faced", "Gk Crosses Stoped", 
+                    "Gk Crosses Stoped %", "Gk Sweeper Actions"]}
 config_comparison_stats = config_dict.ConfigDict(comparison_stats_dict)
 
 # ##### Process Bundesliga Team and Gk Data

@@ -71,12 +71,13 @@ def player_season_stats(data:pd.DataFrame,
         season_player_stats[stat] = season_player_stats[config_player_stats.stats_perc_calculations[stat][1]] / season_player_stats[
             config_player_stats.stats_perc_calculations[stat][0]] * 100
 
-    # ##### Final Processing for Team Statistics
+    # ##### Final Processing for Player Statistics
     season_player_stats.drop(columns=['Aerial Duel'], inplace=True)
     season_player_stats = season_player_stats.T
     season_player_stats = season_player_stats.reindex(config_player_stats.stats_player)
     season_player_stats = season_player_stats.reset_index(drop=False)
     season_player_stats.rename(columns={'index':'Stat'}, inplace=True)
+    season_player_stats.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     return season_player_stats
 
@@ -185,7 +186,7 @@ def comparison_all_stats(data:pd.DataFrame,
         
     season_players_data = season_players_data[[team_player, opponent_player, "Sig"]].reset_index(drop=False)
     season_players_data.rename(columns={"index": "Statistics"}, inplace=True)
-
+    
     # ##### Insight Significance Level
     insight_df = season_players_data['Sig'].value_counts().reset_index(drop=False)
     insight_df['Sig'] = insight_df['Sig'].map({"🟢":'Up',"🔴":'Down'})
@@ -309,14 +310,12 @@ def player_last_seasons_stats(data:pd.DataFrame,
                                              b=all_seasons_data[all_seasons_data['Season Id'] == previous_season][stat].values).pvalue)
     seasons_player_data['Sig'] = sig_comparison_test
     seasons_player_data['Sig'] = seasons_player_data.apply(
-        lambda x: "🟢" if x['Sig'] <=0.05 and x[config_previous_seasons.season_id.keys()[-1]] > 
-        x[config_previous_seasons.season_id.keys()[-2]] else (
-        "🔴" if x['Sig'] <=0.05 and x[config_previous_seasons.season_id.keys()[-1]] < x[config_previous_seasons.season_id.keys()[-2]] else np.nan), axis=1)
+        lambda x: "🟢" if x['Sig'] <=0.05 and x[current_season] > x[previous_season] else (
+                  "🔴" if x['Sig'] <=0.05 and x[current_season] < x[previous_season] else np.nan), axis=1)
     seasons_player_data['Sig_count'] = sig_comparison_test
     seasons_player_data['Sig_count'] = seasons_player_data.apply(
-        lambda x: "Sig Team" if x['Sig_count'] <=0.05 and x[config_previous_seasons.season_id.keys()[-1]] > 
-        x[config_previous_seasons.season_id.keys()[-2]] else (
-        "Sig Opp" if x['Sig_count'] <=0.05 and x[config_previous_seasons.season_id.keys()[-1]] < x[config_previous_seasons.season_id.keys()[-2]] else np.nan), axis=1)
+        lambda x: "Sig Team" if x['Sig_count'] <=0.05 and x[current_season] > x[previous_season] else (
+                   "Sig Opp" if x['Sig_count'] <=0.05 and x[current_season] < x[previous_season] else np.nan), axis=1)
     seasons_player_data.reset_index(drop=False, inplace=True)
     seasons_player_data.rename(columns = {'index':'Statistics'}, inplace=True)
     
@@ -381,7 +380,6 @@ def player_last_seasons_stats(data:pd.DataFrame,
         
     return seasons_player_data, seasons_fig, insight_season_comparison, insights_5_seasons
 
-
 def player_page(data:str,
                 favourite_team:str,
                 page_season:str,
@@ -419,7 +417,7 @@ def player_page(data:str,
         filter_season = st.sidebar.selectbox(label="Season Filter", 
                                              options=season_filters)
     
-    # ##### Player Team Statistics
+    # ##### Player Season Statistics
     if stats_type == "Season":
 
         # ##### Team Stat
@@ -488,7 +486,7 @@ def player_page(data:str,
                         "Stat": st.column_config.Column(
                             width="medium")})
 
-    # ##### Season Player vs Player Statistics
+    # ##### Player vs Player Statistics
     elif stats_type == "Player vs Player":
         
         # ##### Select Opponent

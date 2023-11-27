@@ -20,7 +20,7 @@ def main() -> st:
     st.markdown("")
 
     # ##### Select App Analysis 
-    app_main_menu = ["Game Statistics", "Game Events"]
+    app_main_menu = ["Game Stats", "Game Events"]
     app_selection = option_menu(menu_title=None,
                                 options=app_main_menu,
                                 icons=["clipboard-data-fill", "fast-forward-circle-fill"],
@@ -44,7 +44,7 @@ def main() -> st:
                                           index=pos_index)
 
     # ##### Game Stats Analysis
-    if app_selection == "Game Statistics":
+    if app_selection == "Game Stats":
 
         # ##### Game Stats Page
         game_stats_analysis(team=favourite_team,

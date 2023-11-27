@@ -179,6 +179,7 @@ def team_season_stats(data:pd.DataFrame,
     season_team_stats = season_team_stats.reindex(config_team_stats.stats_team)
     season_team_stats = season_team_stats.reset_index(drop=False)
     season_team_stats.rename(columns={'index':'Stat'}, inplace=True)
+    season_team_stats.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     # ##### Final Processing for Opponent Statistics
     season_opponent_stats.drop(columns=['Aerial Duel'], inplace=True)
@@ -186,6 +187,7 @@ def team_season_stats(data:pd.DataFrame,
     season_opponent_stats = season_opponent_stats.reindex(config_team_stats.stats_team)
     season_opponent_stats = season_opponent_stats.reset_index(drop=False)
     season_opponent_stats.rename(columns={'index':'Stat'}, inplace=True)
+    season_opponent_stats.replace([np.inf, -np.inf], np.nan, inplace=True)
 
     return season_team_stats, season_opponent_stats
 

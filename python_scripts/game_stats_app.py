@@ -6,6 +6,7 @@ from python_scripts.game_stats_app_scripts.standings_stats_script import standin
 from python_scripts.game_stats_app_scripts.game_stats_script import game_stats_page
 from python_scripts.game_stats_app_scripts.team_stats_script import team_page
 from python_scripts.game_stats_app_scripts.player_stats_script import player_page
+from python_scripts.game_stats_app_scripts.gk_stats_script import gk_page
 from python_scripts.game_stats_app_scripts.game_stats_app_utils import supabase_tab_info, process_team_data, process_goals_opponent, filter_season_data
 
 def game_stats_analysis(team:str, 
@@ -16,7 +17,7 @@ def game_stats_analysis(team:str,
     # ##### Load Season Data
     season_team_data = retrieve_season_data(table=supabase_tab_info.team_stats_tab, 
                                             season=season)
-    season_gk_data = retrieve_season_data(table=supabase_tab_info.gk_stas_tab,
+    season_gk_data = retrieve_season_data(table=supabase_tab_info.gk_stats_tab,
                                           season=season)
 
     season_data = filter_season_data(data=process_goals_opponent(
@@ -35,7 +36,7 @@ def game_stats_analysis(team:str,
                        "Game Statistics",
                        "Team Statistics",
                        "Player Statistics",
-                       "Goalkeeper Statistics"]
+                       "Gk Statistics"]
 
     with st.sidebar:
         st.subheader("Statistics")
@@ -70,7 +71,7 @@ def game_stats_analysis(team:str,
                                                           team=team,
                                                           seasons=last_5_seasons,
                                                           team_analysis=True)
-        all_seasons_gk_data = retrieve_all_seasons_data(table=supabase_tab_info.gk_stas_tab,
+        all_seasons_gk_data = retrieve_all_seasons_data(table=supabase_tab_info.gk_stats_tab,
                                                         team=team,
                                                         seasons=last_5_seasons)
         
@@ -102,10 +103,13 @@ def game_stats_analysis(team:str,
                     season_teams=season_teams,
                     last_5_seasons=last_5_seasons)
     
-    # # ##### Goalkeeper Statistics
-    # elif statistics_track == 'Goalkeeper Statistics':
-    #     pass
-    #     # gk_page(page_season=season,
-    #     #         favourite_team=team,
-    #     #         all_seasons=app_seasons)
-    # st.sidebar.markdown("")
+    # ##### Goalkeeper Statistics
+    elif statistics_track == 'Gk Statistics':
+        season_gk_data = filter_season_data(data=season_gk_data)
+        gk_page(data=season_gk_data,
+                favourite_team=team,
+                page_season=season,
+                season_teams=season_teams,
+                last_5_seasons=last_5_seasons)
+        
+    st.sidebar.markdown("")
