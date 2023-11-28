@@ -2,18 +2,27 @@ import streamlit as st
 from supabase import create_client
 from PIL import Image
 from streamlit_option_menu import option_menu
-from python_scripts.game_stats_app_scripts.game_stats_app_utils import supabase_tab_info
-from python_scripts.data_script import retrieve_season_info, retrieve_season_teams
+from python_scripts.data_script import BunesligaInfo, BundesligaGameData
+from python_scripts.game_stats_app_scripts.game_stats_utils import GameStatsConfiguration, GameStatsProcessing
 from python_scripts.game_stats_app import game_stats_analysis
 
 
 def main() -> st:
 
+    # ##### Initialize Data
+    bundesliga_info = BunesligaInfo()
+    bundesliga_game_data = BundesligaGameData()
+
+    # ##### Initialize Configuration
+    game_stats_config = GameStatsConfiguration()
+    game_stats_processing = GameStatsProcessing()
+
     # ##### Bundesliga Logo
     st.sidebar.image(Image.open('images/Bundesliga.png'))
 
     # ##### Available Seasons
-    last_5_seasons, last_5_seasons_id = retrieve_season_info(table=supabase_tab_info.info_tab)
+    table_info = game_stats_config.get_tab_info()
+    last_5_seasons, _ = bundesliga_info.retrieve_season_info(table=table_info.info_tab)
 
     # ##### Set Application Name and Options
     st.markdown(f"<h1><font color = #d20614>Bundesliga</font> Stats</h1>", unsafe_allow_html=True)
@@ -37,8 +46,8 @@ def main() -> st:
                                             index=4)
 
     # ##### Select Favourite Team
-    available_teams, pos_index = retrieve_season_teams(table=supabase_tab_info.info_tab,
-                                                       season=season_selected)
+    available_teams, pos_index = bundesliga_info.retrieve_season_teams(table=table_info.info_tab,
+                                                                       season=season_selected)
     favourite_team = st.sidebar.selectbox(label="Team", 
                                           options=available_teams, 
                                           index=pos_index)
@@ -47,7 +56,11 @@ def main() -> st:
     if app_selection == "Game Stats":
 
         # ##### Game Stats Page
-        game_stats_analysis(team=favourite_team,
+        game_stats_analysis(bundesliga_info=bundesliga_info,
+                            bundesliga_game_data=bundesliga_game_data,
+                            game_stats_config=game_stats_config,
+                            game_stats_processing=game_stats_processing,
+                            team=favourite_team,
                             season_teams=available_teams,
                             season=season_selected,
                             last_5_seasons=last_5_seasons)

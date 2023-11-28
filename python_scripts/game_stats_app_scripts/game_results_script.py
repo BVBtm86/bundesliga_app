@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from python_scripts.game_stats_app_scripts.game_stats_app_utils import config_teams_images
+from python_scripts.game_stats_app_scripts.game_stats_utils import GameStatsConfiguration
 
-
-def game_results_page(data:pd.DataFrame,
+# ##### Game Results Page
+def game_results_page(game_stats_config:GameStatsConfiguration,
+                      data:pd.DataFrame,
                       page_season:str,
                       favourite_team:str) -> st:
     
@@ -27,10 +28,11 @@ def game_results_page(data:pd.DataFrame,
     match_day_data.rename(columns={'Team':'Home Team', 'Opponent': 'Away Team'}, inplace=True)
 
     # ##### Teams Logo
-    home_logo_data = [config_teams_images['config_teams_logo'][team] for team in match_day_data['Home Team']]
+    teams_info = game_stats_config.get_teams_info()
+    home_logo_data = [teams_info['config_teams_logo'][team] for team in match_day_data['Home Team']]
     match_day_data.insert(0, " ", home_logo_data)
 
-    away_logo_data = [config_teams_images['config_teams_logo'][team] for team in match_day_data['Away Team']]
+    away_logo_data = [teams_info['config_teams_logo'][team] for team in match_day_data['Away Team']]
     match_day_data.insert(4, "  ", away_logo_data)
 
     st.markdown(f'<h4>Season <font color = #d20614>{page_season}</font> Match Day <font color = #d20614>{match_day}</font> Results</h4>', unsafe_allow_html=True)
