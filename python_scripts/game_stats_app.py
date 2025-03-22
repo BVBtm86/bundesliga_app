@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
 from python_scripts.data_script import BunesligaInfo, BundesligaGameData
@@ -21,8 +22,13 @@ def game_stats_analysis(bundesliga_info:BunesligaInfo,
 
     # ##### Load Season Data
     table_info = game_stats_config.get_tab_info()
-    season_team_data = bundesliga_game_data.retrieve_season_data(table=table_info.team_stats_tab, 
+    season_stats_team_data = bundesliga_game_data.retrieve_season_data(table=table_info.team_stats_tab, 
                                                                  season=season)
+    season_tracking_team_data = bundesliga_game_data.retrieve_season_data(table=table_info.team_tracking_tab,
+                                                                          season=season)
+    season_team_data = pd.merge(left=season_stats_team_data, 
+                                right=season_tracking_team_data.drop(columns=['id']), 
+                                on=['Season', 'Week No', 'Team', 'Opponent', 'Venue'])
     season_gk_data = bundesliga_game_data.retrieve_season_data(table=table_info.gk_stats_tab,
                                                                season=season)
 
@@ -77,21 +83,32 @@ def game_stats_analysis(bundesliga_info:BunesligaInfo,
     ##### Team Statistics
     elif statistics_track == 'Team Statistics':
         # ##### Load Last 5 Seasons Data
-        all_seasons_team_data = bundesliga_game_data.retrieve_all_seasons_data(table=table_info.team_stats_tab,
+        all_seasons_team_stats_data = bundesliga_game_data.retrieve_all_seasons_data(
+            table=table_info.team_stats_tab,
+            team=team,
+            seasons=last_5_seasons,
+            team_analysis=True)
+        all_seasons_team_tracking_data = bundesliga_game_data.retrieve_all_seasons_data(table=table_info.team_tracking_tab,
                                                                                team=team,
                                                                                seasons=last_5_seasons,
                                                                                team_analysis=True)
+   
+        all_seasons_team_data = pd.merge(left=all_seasons_team_stats_data, 
+                                         right=all_seasons_team_tracking_data.drop(columns=['id']), 
+                                         on=['Season', 'Week No', 'Team', 'Opponent', 'Venue'])
+        
         all_seasons_gk_data = bundesliga_game_data.retrieve_all_seasons_data(table=table_info.gk_stats_tab,
                                                                              team=team,
                                                                              seasons=last_5_seasons)
         
         # ##### Process Last 5 Seasons Data
         all_seasons_data = game_stats_processing.filter_season_data(
-            data=game_stats_processing.process_team_data(data=all_seasons_team_data,
-                                                         data_gk=all_seasons_gk_data))
+            data=game_stats_processing.process_goals_opponent(
+                data=game_stats_processing.process_team_data(data=all_seasons_team_data, 
+                                                             data_gk=all_seasons_gk_data)))
         
         # ##### Retrieve Season Games
-        season_games_schedule=bundesliga_info.retrieve_season_games(table=table_info.games_tab,
+        season_games_schedule=bundesliga_info.retrieve_season_games(table=table_info.info_tab,
                                                                     season=season)
 
         # ##### Team Page
@@ -102,25 +119,25 @@ def game_stats_analysis(bundesliga_info:BunesligaInfo,
                   favourite_team=team,
                   season_teams=season_teams)
     
-    # # ##### Player Statistics
-    elif statistics_track == 'Player Statistics':
-        season_player_data = game_stats_processing.filter_season_data(data=bundesliga_game_data.retrieve_season_data(
-            table=table_info.player_stats_tab, season=season))
+    # # # ##### Player Statistics
+    # elif statistics_track == 'Player Statistics':
+    #     season_player_data = game_stats_processing.filter_season_data(data=bundesliga_game_data.retrieve_season_data(
+    #         table=table_info.player_stats_tab, season=season))
   
-        player_page(data=season_player_data,
-                    favourite_team=team,
-                    page_season=season,
-                    season_teams=season_teams,
-                    last_5_seasons=last_5_seasons)
+    #     player_page(data=season_player_data,
+    #                 favourite_team=team,
+    #                 page_season=season,
+    #                 season_teams=season_teams,
+    #                 last_5_seasons=last_5_seasons)
     
-    # ##### Goalkeeper Statistics
-    elif statistics_track == 'Gk Statistics':
-        season_gk_data = game_stats_processing.filter_season_data(data=season_gk_data)
+    # # ##### Goalkeeper Statistics
+    # elif statistics_track == 'Gk Statistics':
+    #     season_gk_data = game_stats_processing.filter_season_data(data=season_gk_data)
 
-        gk_page(data=season_gk_data,
-                favourite_team=team,
-                page_season=season,
-                season_teams=season_teams,
-                last_5_seasons=last_5_seasons)
+    #     gk_page(data=season_gk_data,
+    #             favourite_team=team,
+    #             page_season=season,
+    #             season_teams=season_teams,
+    #             last_5_seasons=last_5_seasons)
         
-    st.sidebar.markdown("")
+    # st.sidebar.markdown("")

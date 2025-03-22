@@ -20,7 +20,7 @@ def standings_page(game_stats_config:GameStatsConfiguration,
     season_df = game_stats_processing.filter_season_data(data=data_processed)
 
     # ##### Check Max Match Day
-    match_day = season_df['Week_No'].max()
+    match_day = season_df['Week No'].max()
 
     # ##### Season Table Filter
     season_filters = game_stats_config.get_season_filter()

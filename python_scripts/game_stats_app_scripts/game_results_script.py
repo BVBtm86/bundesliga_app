@@ -16,13 +16,13 @@ def game_results_page(game_stats_config:GameStatsConfiguration,
     season_df = data.copy()
 
     # ##### Show Match Day
-    available_match_days = np.linspace(1, season_df['Week_No'].max(), season_df['Week_No'].max(), dtype=np.int32)
+    available_match_days = np.linspace(1, season_df['Week No'].max(), season_df['Week No'].max(), dtype=np.int32)
     match_day = st.sidebar.selectbox(label="Match Day",
                                      options=available_match_days,
                                      index=len(available_match_days) - 1)
     
     # ##### Filter Season Data by Match Day and Format Data
-    match_day_data = season_df[(season_df['Week_No'] == match_day) & (season_df['Venue'] == 'Home')].reset_index(drop=True)
+    match_day_data = season_df[(season_df['Week No'] == match_day) & (season_df['Venue'] == 'Home')].reset_index(drop=True)
     match_day_data['Result'] = match_day_data['Goals'].astype(str) + ' - ' + match_day_data['Goals Ag'].astype(str)
     match_day_data = match_day_data[['Team', 'Result', 'Opponent']]
     match_day_data.rename(columns={'Team':'Home Team', 'Opponent': 'Away Team'}, inplace=True)

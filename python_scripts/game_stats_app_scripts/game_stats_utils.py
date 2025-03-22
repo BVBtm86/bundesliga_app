@@ -16,8 +16,8 @@ class GameStatsConfiguration:
         # ########## Supabase Tables
         self.tab_info_dict = {
             "info_tab": "buli_seasons_info",
-            "games_tab": "buli_games_schedule",
             "team_stats_tab": "buli_stats_team",
+            "team_tracking_tab": "buli_tracking_team",
             "player_stats_tab": "buli_stats_player",
             "gk_stats_tab": "buli_stats_gk"
             }
@@ -323,10 +323,10 @@ class GameStatsProcessing:
      
     def __init__(self) -> None:
         
-        self.groupby_stats = ["Season", "Week_No", "Team", "Opponent", "Venue"]
+        self.groupby_stats = ["Season", "Week No", "Team", "Opponent", "Venue"]
         self.agg_gk_stats = ['Gk Shots on Target Against', 'Saves', 'Post-Shot xGoal', 'Launched Passes', 'Launched Passes Completed', 'Gk Passes', 
                              'Gk Throws', 'Goal Kicks', 'Gk Crosses Faced', 'Gk Crosses Stoped', 'Gk Sweeper Actions']
-        self.merge_stats = ['Season', 'Week_No', 'Team', 'Opponent', 'Venue']
+        self.merge_stats = ['Season', 'Week No', 'Team', 'Opponent', 'Venue']
         self.table_group = ['Season', 'Win', 'Draw', 'Defeat', 'Goals', 'Goals Ag']
         self.table_stats = ["Team", "MP", "W", "D", "L", "GF", "GA", "GD", "Pts"]
 
@@ -341,9 +341,9 @@ class GameStatsProcessing:
         buli_gk_df = data_gk.copy()
 
         # ##### Change Name Statistics
-        buli_df['Team_Lineup'] = buli_df['Team_Lineup'].apply(lambda x: x.replace("◆", ""))
-        buli_df['Opp_Lineup'] = buli_df['Opp_Lineup'].apply(lambda x: x.replace("◆", ""))
-        buli_df.rename(columns={"Team_Lineup": "Lineup"}, inplace=True)
+        buli_df['Team Lineup'] = buli_df['Team Lineup'].apply(lambda x: x.replace("◆", ""))
+        buli_df['Opp Lineup'] = buli_df['Opp Lineup'].apply(lambda x: x.replace("◆", ""))
+        buli_df.rename(columns={"Team Lineup": "Lineup"}, inplace=True)
 
         # ##### Aggregate Goalkeeper Statistics
         df_team_gk = \
@@ -376,7 +376,7 @@ class GameStatsProcessing:
         home_df['Goals Ag'] = away_df['Goals']
         away_df['Goals Ag'] = home_df['Goals']
         final_buli_df = pd.concat([home_df, away_df])
-        final_buli_df = final_buli_df.sort_values(by=['Id'])
+        final_buli_df = final_buli_df.sort_values(by=['id'])
         final_buli_df.reset_index(drop=True, inplace=True)
 
         return final_buli_df
@@ -394,10 +394,10 @@ class GameStatsProcessing:
         buli_df['Season'] = 1
         buli_df['Home'] = np.where(buli_df['Venue'] == "Home", 1, 0)
         buli_df['Away'] = np.where(buli_df['Venue'] == "Away", 1, 0)
-        buli_df["1st Half"] = np.where(buli_df["Week_No"] <= 17, 1, 0)
-        buli_df["2nd Half"] = np.where(buli_df["Week_No"] >= 18, 1, 0)
-        form_games = list(buli_df["Week_No"].unique())[-5:]
-        buli_df["Form"] = np.where(buli_df["Week_No"].isin(form_games),1, 0)
+        buli_df["1st Half"] = np.where(buli_df["Week No"] <= 17, 1, 0)
+        buli_df["2nd Half"] = np.where(buli_df["Week No"] >= 18, 1, 0)
+        form_games = list(buli_df["Week No"].unique())[-5:]
+        buli_df["Form"] = np.where(buli_df["Week No"].isin(form_games),1, 0)
 
         return buli_df
 
@@ -597,11 +597,11 @@ class TeamStatsAnalysis:
         season_important_stats.append((season_data[season_data['Team'] == team]['Win'] * 3 + season_data[season_data['Team'] == team]['Draw']).sum())
         season_important_stats.append(season_data[season_data['Team'] == team][self.importance_stats.team_important_stats[4]].sum())
         season_important_stats.append(season_data[season_data['Team'] == team][self.importance_stats.team_important_stats[5]].sum())
-        current_season_match_day = season_data['Week_No'].max()
+        current_season_match_day = season_data['Week No'].max()
 
         # ##### Last Season Stats
         season_previous = previous_seasons[current_season]
-        previous_data_season = data_all[(data_all['Season Id'] == season_previous) & (data_all['Week_No'] <= current_season_match_day)].reset_index(drop=True)
+        previous_data_season = data_all[(data_all['Season Id'] == season_previous) & (data_all['Week No'] <= current_season_match_day)].reset_index(drop=True)
         if previous_data_season.shape[0] > 0:
             previous_season_important_stats = list(previous_data_season[previous_data_season['Team'] == team][self.importance_stats.team_important_stats[:4]].mean().round(2).values)
             previous_data_season['Win'] = np.where(previous_data_season['Result'] == 'Win', 1, 0)
@@ -637,8 +637,8 @@ class TeamStatsAnalysis:
         # ##### Create Team Chart
         df_team['TEAM'] = df_team['Team']
         df_opp['TEAM'] = "Opponent"
-        df_team['Game'] = df_team['Week_No']
-        df_opp['Game'] = df_opp['Week_No']
+        df_team['Game'] = df_team['Week No']
+        df_opp['Game'] = df_opp['Week No']
         plot_data = pd.concat([df_team, df_opp])
         min_value = np.min(plot_data[stat_name]) * 0.8
         if min_value < 10:
@@ -846,10 +846,10 @@ class TeamStatsAnalysis:
         seasons_data = data.copy()
         # ##### Filter Only Team and Opponent Games
         games_opponent = seasons_data[(seasons_data['Opponent'] == team_opponent) & 
-                                    (seasons_data['Season Id'] <= self.season_info.season_id[season_filter] + 1)].sort_values(by=['Season Id', 'Week_No'], ascending=[False, False])
+                                    (seasons_data['Season Id'] <= self.season_info.season_id[season_filter] + 1)].sort_values(by=['Season Id', 'Week No'], ascending=[False, False])
 
         # ##### Get Last 5 Games Played
-        last_5_games_df = games_opponent.iloc[:5,:][['Season Id', 'Week_No', 'Venue', 'Team', 'Opponent', 'Goals', 'Goals Ag']]
+        last_5_games_df = games_opponent.iloc[:5,:][['Season Id', 'Week No', 'Venue', 'Team', 'Opponent', 'Goals', 'Goals Ag']]
 
         # ##### Create Last 5 Games
         change_opponent = last_5_games_df.loc[last_5_games_df['Venue'] == 'Away',['Opponent','Team']]
@@ -859,10 +859,10 @@ class TeamStatsAnalysis:
         last_5_games_df.loc[last_5_games_df['Venue'] == 'Away', 'Goals'] = change_goals['Goals Ag']
         last_5_games_df.loc[last_5_games_df['Venue'] == 'Away', 'Goals Ag'] = change_goals['Goals']
         last_5_games_df['Result'] = last_5_games_df['Goals'].astype(str) + '-' + last_5_games_df['Goals Ag'].astype(str)
-        last_5_games_df = last_5_games_df[['Season Id', 'Week_No', 'Team', 'Result', 'Opponent']]
+        last_5_games_df = last_5_games_df[['Season Id', 'Week No', 'Team', 'Result', 'Opponent']]
         last_5_games_df['Season Id'] = last_5_games_df['Season Id'].map(dict((int(value+1), key) for key, value in self.season_info.season_id.items()))
 
-        last_5_games_df.rename(columns={'Season Id':'Season', 'Week_No':'Week No', 'Team':'Home Team', 'Opponent':'Away Team'}, inplace=True)
+        last_5_games_df.rename(columns={'Season Id':'Season', 'Week No':'Week No', 'Team':'Home Team', 'Opponent':'Away Team'}, inplace=True)
         
         return last_5_games_df
 
@@ -991,13 +991,13 @@ class TeamStatsAnalysis:
         
         # ##### Season Data
         season_df = data.copy()
-        max_day = season_df['Week_No'].max()
+        max_day = season_df['Week No'].max()
 
         # #### Create Match Day Tab
         team_rank = []
         opponent_rank = []
         for day in range(1, max_day + 1):
-            match_day_df = season_df[season_df['Week_No'] <= day]
+            match_day_df = season_df[season_df['Week No'] <= day]
             # ##### Run Table Data
             tab_data = GameStatsProcessing().buli_table_data(data=match_day_df,
                                                              table_type='Season')
@@ -1186,7 +1186,7 @@ class PlayerStatsAnalysis:
 
         if df_match_day[stat_name].sum() > 0:
             match_day_fig = px.bar(df_match_day, 
-                                x="Week_No", 
+                                x="Week No", 
                                 y=stat_name, 
                                 color="Result", 
                                 color_discrete_map={
@@ -1201,7 +1201,7 @@ class PlayerStatsAnalysis:
                 xaxis1=dict(
                     tickmode='array',
                     tickvals=[i for i in range(1, len(df_match_day) + 1)],
-                    ticktext=df_match_day['Week_No'].unique(),
+                    ticktext=df_match_day['Week No'].unique(),
                 ), 
                 yaxis_range=[min_value, max_value]
             )

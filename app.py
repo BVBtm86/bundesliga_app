@@ -18,9 +18,9 @@ def main() -> st:
     game_stats_processing = GameStatsProcessing()
 
     # ##### Bundesliga Logo
-    st.sidebar.image(Image.open('images/Bundesliga.png'))
+    st.logo('images/Bundesliga.png', size="large")
 
-    # ##### Available Seasons
+    # # ##### Available Seasons
     table_info = game_stats_config.get_tab_info()
     last_5_seasons, _ = bundesliga_info.retrieve_season_info(table=table_info.info_tab)
 
@@ -28,24 +28,12 @@ def main() -> st:
     st.markdown(f"<h1><font color = #d20614>Bundesliga</font> Stats</h1>", unsafe_allow_html=True)
     st.markdown("")
 
-    # ##### Select App Analysis 
-    app_main_menu = ["Game Stats", "Game Events"]
-    app_selection = option_menu(menu_title=None,
-                                options=app_main_menu,
-                                icons=["clipboard-data-fill", "fast-forward-circle-fill"],
-                                orientation="horizontal",
-                                styles={
-                                    "container": {"width": "100%!important",
-                                                  "background-color": "#e5e5e6"},
-                                    "nav-link": {"--hover-color": "#ffffff"},
-                                })
-
     # ##### Select Season
     season_selected = st.sidebar.selectbox(label="Season",
                                             options=last_5_seasons,
                                             index=4)
 
-    # ##### Select Favourite Team
+    ##### Select Favourite Team
     available_teams, pos_index = bundesliga_info.retrieve_season_teams(table=table_info.info_tab,
                                                                        season=season_selected)
     favourite_team = st.sidebar.selectbox(label="Team", 
@@ -53,23 +41,14 @@ def main() -> st:
                                           index=pos_index)
 
     # ##### Game Stats Analysis
-    if app_selection == "Game Stats":
-
-        # ##### Game Stats Page
-        game_stats_analysis(bundesliga_info=bundesliga_info,
-                            bundesliga_game_data=bundesliga_game_data,
-                            game_stats_config=game_stats_config,
-                            game_stats_processing=game_stats_processing,
-                            team=favourite_team,
-                            season_teams=available_teams,
-                            season=season_selected,
-                            last_5_seasons=last_5_seasons)
-
-    # ##### Game Events Analysis
-    elif app_selection == "Game Events":
-        
-        # ##### Game Events Analysis
-        pass
+    game_stats_analysis(bundesliga_info=bundesliga_info,
+                        bundesliga_game_data=bundesliga_game_data,
+                        game_stats_config=game_stats_config,
+                        game_stats_processing=game_stats_processing,
+                        team=favourite_team,
+                        season_teams=available_teams,
+                        season=season_selected,
+                        last_5_seasons=last_5_seasons)
 
     # ##### App Source Info
     with st.expander(label="Data Source"):

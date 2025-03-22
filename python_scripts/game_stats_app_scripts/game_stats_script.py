@@ -84,7 +84,7 @@ def game_stats_page(data:pd.DataFrame,
     match_day = \
         season_buli_df[(season_buli_df['Team'] == home_team) & 
                        (season_buli_df['Opponent'] == away_team) &
-                       (season_buli_df['Venue'] == 'Home')]['Week_No'].values[0]
+                       (season_buli_df['Venue'] == 'Home')]['Week No'].values[0]
 
     # ##### Statistics Type Config
     icon_col, stat_name_col, home_stat_col, away_stat_col = st.columns([0.25, 1.25, 2.25, 3])

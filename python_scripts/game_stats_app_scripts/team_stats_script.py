@@ -67,7 +67,7 @@ def team_page(data:pd.DataFrame,
             st.markdown(
                 f"<b>Note:</b> <b><font color = #43C673>{page_season}</font></b> vs <b><font color = #d20614> "
                 f"{team_analysis.season_info.season_comparison[page_season]}</font></b> Season comparison after "
-                f"<b>Match Day <font color = #d20614>{data['Week_No'].max()}</font></b> ", unsafe_allow_html=True)
+                f"<b>Match Day <font color = #d20614>{data['Week No'].max()}</font></b> ", unsafe_allow_html=True)
 
         # ##### Team Match Day Stats
         st.markdown(f'<h4>{favourite_team} <font color = #d20614>{page_season}</font> Match Day Stats</h4>', unsafe_allow_html=True)
@@ -156,7 +156,7 @@ def team_page(data:pd.DataFrame,
     elif stats_type == "Team vs Team":
         
         # ##### Get Current Match Day Week
-        current_match_day = data['Week_No'].max()
+        current_match_day = data['Week No'].max()
         if current_match_day < 34:
             next_game = current_match_day + 1
         else:
