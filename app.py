@@ -17,7 +17,7 @@ def main() -> None:
         game_stats_processing = GameStatsProcessing()
 
         # Bundesliga Logo
-        st.logo('images/Bundesliga.png', size="large")
+        st.logo("images/Bundesliga App Logo.svg", size="medium")
 
         #  Available Seasons
         table_info = game_stats_config.get_tab_info()
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         # Bundesliga App Settings
         st.set_page_config(layout="wide",
                            page_title="Bundesliga App",
-                           page_icon=Image.open('images/Bundesliga.png'),
+                           page_icon=Image.open('images/Bundesliga App Icon.png'),
                            initial_sidebar_state="expanded")
         st.markdown('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
 
