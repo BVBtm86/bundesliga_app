@@ -5,11 +5,11 @@ both Teams and Players
 
 App Features
 
-- Match Day Statistics
+- Match Day Results
 - Season Table
+- Match Day Statistics
 - Team Statistics
 - Player Statistics
-- Player vs Player Statistics
 - Goalkeeper Statistics
 
 Data Reference:
